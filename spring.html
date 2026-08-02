@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring Interview Prep — 100 Questions</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f14;
+  --bg2: #13161e;
+  --bg3: #1a1e29;
+  --surface: #1e2330;
+  --surface2: #252b3b;
+  --border: #2e3447;
+  --border2: #3d4560;
+  --text: #e8ecf4;
+  --muted: #7a84a0;
+  --accent: #5b7cf6;
+  --accent2: #8b5cf6;
+  --green: #34d399;
+  --amber: #fbbf24;
+  --coral: #f87171;
+  --teal: #22d3ee;
+  --pink: #f472b6;
+  --tag-core: #1e3a5f;
+  --tag-core-t: #60a5fa;
+  --tag-di: #2d1b69;
+  --tag-di-t: #a78bfa;
+  --tag-boot: #064e3b;
+  --tag-boot-t: #34d399;
+  --tag-mvc: #451a03;
+  --tag-mvc-t: #fbbf24;
+  --tag-data: #14532d;
+  --tag-data-t: #86efac;
+  --tag-sec: #450a0a;
+  --tag-sec-t: #f87171;
+  --tag-aop: #431407;
+  --tag-aop-t: #fb923c;
+  --tag-tx: #1c1917;
+  --tag-tx-t: #a8a29e;
+  --tag-cloud: #4a044e;
+  --tag-cloud-t: #f0abfc;
+  --tag-test: #083344;
+  --tag-test-t: #22d3ee;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Lora', Georgia, serif;
+  font-size: 15px;
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+/* — NOISE OVERLAY — */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+}
+
+/* — HEADER — */
+header {
+  position: relative;
+  padding: 60px 40px 50px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, #0a0c12 0%, var(--bg) 100%);
+  overflow: hidden;
+}
+
+header::after {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(91,124,246,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.header-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.badge {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid rgba(91,124,246,0.35);
+  padding: 4px 12px;
+  border-radius: 2px;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: #fff;
+  margin-bottom: 14px;
+}
+
+h1 span {
+  color: var(--accent);
+}
+
+.sub {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  color: var(--muted);
+  font-size: 15px;
+  margin-bottom: 32px;
+}
+
+/* — CONTROLS — */
+.controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+}
+
+.search-wrap svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+
+#search {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  padding: 11px 14px 11px 42px;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+#search:focus { border-color: var(--accent); }
+#search::placeholder { color: var(--muted); }
+
+.pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.pill:hover { border-color: var(--border2); color: var(--text); background: var(--surface); }
+.pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* — MAIN — */
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 40px 80px;
+  position: relative;
+  z-index: 1;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.stats-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.expand-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* — QUESTION CARD — */
+.qcard {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  background: var(--bg2);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.qcard:hover { border-color: var(--border2); }
+.qcard.open { border-color: rgba(91,124,246,0.4); background: var(--surface); }
+
+.qhead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.qnum {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  min-width: 26px;
+  flex-shrink: 0;
+}
+
+.qtxt {
+  flex: 1;
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.qcard.open .qtxt { color: #fff; }
+
+.qtag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--muted);
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+.qcard.open .chevron { transform: rotate(180deg); color: var(--accent); }
+
+/* — ANSWER BODY — */
+.qbody {
+  display: none;
+  padding: 0 20px 18px 60px;
+  font-family: 'Lora', serif;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #b0bac8;
+  border-top: 1px solid var(--border);
+}
+
+.qbody.show { display: block; }
+
+.qbody code {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  background: rgba(91,124,246,0.12);
+  color: #93a8f4;
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+.qbody pre {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  background: #0a0c12;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  color: #93a8f4;
+  padding: 14px 16px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+.qbody strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* — TOPIC COLORS — */
+.tag-core   { background: var(--tag-core);   color: var(--tag-core-t); }
+.tag-di     { background: var(--tag-di);     color: var(--tag-di-t); }
+.tag-boot   { background: var(--tag-boot);   color: var(--tag-boot-t); }
+.tag-mvc    { background: var(--tag-mvc);    color: var(--tag-mvc-t); }
+.tag-data   { background: var(--tag-data);   color: var(--tag-data-t); }
+.tag-sec    { background: var(--tag-sec);    color: var(--tag-sec-t); }
+.tag-aop    { background: var(--tag-aop);    color: var(--tag-aop-t); }
+.tag-tx     { background: var(--tag-tx);     color: var(--tag-tx-t); }
+.tag-cloud  { background: var(--tag-cloud);  color: var(--tag-cloud-t); }
+.tag-test   { background: var(--tag-test);   color: var(--tag-test-t); }
+
+/* — NO RESULTS — */
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+}
+
+/* — SCROLL TOP — */
+.scroll-top {
+  position: fixed;
+  bottom: 32px; right: 32px;
+  width: 40px; height: 40px;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 100;
+}
+.scroll-top.visible { opacity: 1; transform: translateY(0); }
+
+/* — ANIMATIONS — */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.qcard { animation: fadeIn 0.25s ease both; }
+
+@media (max-width: 640px) {
+  header { padding: 40px 20px 36px; }
+  main { padding: 24px 16px 60px; }
+  .qtag { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="badge">Interview Prep · Spring Framework</div>
+    <h1>100 Spring <span>Questions</span></h1>
+    <p class="sub">Core · DI · Boot · MVC · Data · Security · AOP · Transactions · Cloud · Testing</p>
+
+    <div class="controls">
+      <div class="search-wrap">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="search" placeholder="Search questions or answers…" oninput="render()">
+      </div>
+    </div>
+
+    <div class="pills" style="margin-top:14px" id="pills"></div>
+  </div>
+</header>
+
+<main>
+  <div class="stats-row">
+    <span class="stats-label" id="stats"></span>
+    <button class="expand-btn" onclick="toggleAll()">Expand all</button>
+  </div>
+  <div id="list"></div>
+</main>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">
+  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg>
+</button>
+
+<script>
+const TOPICS = [
+  {id:'all',  label:'All'},
+  {id:'core', label:'Core Spring'},
+  {id:'di',   label:'DI'},
+  {id:'boot', label:'Spring Boot'},
+  {id:'mvc',  label:'Spring MVC'},
+  {id:'data', label:'Spring Data'},
+  {id:'sec',  label:'Security'},
+  {id:'aop',  label:'AOP'},
+  {id:'tx',   label:'Transactions'},
+  {id:'cloud',label:'Spring Cloud'},
+  {id:'test', label:'Testing'},
+];
+
+const Q = [
+  {id:'core',q:'What is the Spring Framework?',a:'Spring is a lightweight, open-source Java framework used to build enterprise applications. Its core idea is Inversion of Control (IoC) and Dependency Injection (DI), which reduce tight coupling between components. Spring provides modules such as Spring Core, MVC, Data JPA, Security, AOP, and Boot. In interviews, mention that Spring makes applications modular, testable, and easier to maintain.'},
+  {id:'core',q:'What is the Spring IoC container?',a:'The IoC (Inversion of Control) container creates objects (beans), wires their dependencies, configures them, and manages their lifecycle. The two main implementations are <code>BeanFactory</code> (lazy, lightweight) and <code>ApplicationContext</code> (eager, feature-rich — preferred in most apps).'},
+  {id:'core',q:'What is a Spring Bean?',a:'A Spring Bean is any object managed by the Spring IoC container. Beans are created from bean definitions (via XML, annotations, or Java config), and Spring handles their instantiation, dependency injection, and destruction. By default, beans are singletons.'},
+  {id:'core',q:'What are the different bean scopes in Spring?',a:'Spring provides five scopes: <code>singleton</code> (one instance per container — default), <code>prototype</code> (new instance every time), <code>request</code> (one per HTTP request), <code>session</code> (one per HTTP session), and <code>application</code> (one per ServletContext). Web-aware scopes need a web-capable ApplicationContext.'},
+  {id:'core',q:'What is the difference between BeanFactory and ApplicationContext?',a:'<code>BeanFactory</code> is the basic container with lazy bean initialization. <code>ApplicationContext</code> extends it with eager initialization, event propagation, i18n, AOP integration, and environment abstraction. Use <code>ApplicationContext</code> in nearly all applications.'},
+  {id:'core',q:'What is the Spring bean lifecycle?',a:'The lifecycle goes: instantiation → populate properties → <code>BeanNameAware</code>/<code>BeanFactoryAware</code> callbacks → <code>BeanPostProcessor#postProcessBeforeInitialization</code> → <code>@PostConstruct</code>/init-method → <code>BeanPostProcessor#postProcessAfterInitialization</code> → bean in use → <code>@PreDestroy</code>/destroy-method → destruction.'},
+  {id:'core',q:'What are Spring configuration metadata types?',a:'Spring supports three types: XML-based (traditional <code>beans.xml</code>), annotation-based (<code>@Component</code>, <code>@Autowired</code>), and Java-based (<code>@Configuration</code> + <code>@Bean</code> methods). Modern apps prefer Java + annotation style.'},
+  {id:'core',q:'What is @Component and its specializations?',a:'<code>@Component</code> is the generic stereotype. Specializations: <code>@Service</code> (service layer), <code>@Repository</code> (DAO — also translates persistence exceptions), and <code>@Controller</code> / <code>@RestController</code> (web layer). All trigger classpath scanning.'},
+  {id:'core',q:"What is Spring's Environment abstraction?",a:'The <code>Environment</code> interface models two aspects: <strong>profiles</strong> (named logical groupings of bean definitions activated conditionally) and <strong>properties</strong> (key-value pairs from property files, system properties, environment variables, etc.).'},
+  {id:'core',q:'What is @Conditional?',a:'<code>@Conditional</code> registers a bean only when a condition is met. Implement <code>Condition</code> and override <code>matches()</code>. Spring Boot uses built-in conditionals heavily: <code>@ConditionalOnClass</code>, <code>@ConditionalOnMissingBean</code>, <code>@ConditionalOnProperty</code>, etc.'},
+  {id:'core',q:"What is Spring's event system?",a:'Spring provides an event model via <code>ApplicationEvent</code> and <code>ApplicationListener</code>. Publish with <code>ApplicationEventPublisher.publishEvent()</code>. Listen with <code>@EventListener</code> on any bean method. Supports <code>@Async</code> listeners. Built-in events: <code>ContextRefreshedEvent</code>, <code>ContextClosedEvent</code>.'},
+
+  {id:'di',q:'What is Dependency Injection (DI)?',a:'DI is a design pattern where an object\'s dependencies are provided by an external entity (the container) rather than the object creating them itself. Spring supports constructor injection (recommended for mandatory deps), setter injection (optional deps), and field injection.'},
+  {id:'di',q:'Constructor injection vs setter injection?',a:'Constructor injection passes dependencies via the constructor — ensures the object is always fully initialized and supports immutability. Setter injection uses setter methods — useful for optional dependencies. Spring recommends constructor injection for mandatory deps.'},
+  {id:'di',q:'What is @Autowired?',a:'<code>@Autowired</code> tells Spring to inject a dependency automatically by type. Placed on constructors, setters, or fields. If multiple beans match the type, use <code>@Qualifier</code> to disambiguate. Optional injection: <code>@Autowired(required=false)</code>.'},
+  {id:'di',q:'What is @Qualifier?',a:'<code>@Qualifier</code> is used alongside <code>@Autowired</code> to specify which bean to inject when multiple beans of the same type exist. Example: <code>@Autowired @Qualifier("mySpecificBean")</code>. You can also create custom qualifier annotations.'},
+  {id:'di',q:'What is @Primary?',a:'<code>@Primary</code> marks a bean as the preferred candidate when multiple beans of the same type exist and no <code>@Qualifier</code> is specified. It\'s a coarser-grained mechanism than <code>@Qualifier</code>.'},
+  {id:'di',q:'Difference between @Inject and @Autowired?',a:'<code>@Inject</code> is JSR-330 standard; <code>@Autowired</code> is Spring-specific. Both do type-based injection. <code>@Autowired</code> has the extra <code>required</code> attribute. <code>@Inject</code> uses <code>@Named</code> instead of <code>@Qualifier</code> for disambiguation.'},
+  {id:'di',q:'What is circular dependency in Spring?',a:'Circular dependency occurs when bean A depends on bean B and B depends on A. Spring resolves it for singletons using setter injection (three-level cache). Constructor injection circular dependencies always throw <code>BeanCurrentlyInCreationException</code>. Best fix: redesign to avoid the cycle.'},
+  {id:'di',q:'What is @Value?',a:'<code>@Value</code> injects values from property files, environment variables, or SpEL expressions. Example: <code>@Value("${app.name}")</code> injects the <code>app.name</code> property. SpEL: <code>@Value("#{systemProperties[\'user.home\']}")</code>.'},
+  {id:'di',q:'What is Spring Expression Language (SpEL)?',a:'SpEL is a powerful expression language supporting querying and manipulating object graphs at runtime: property access, method calls, math/logical operators, bean references. Used in <code>@Value</code>, XML config, and Spring Security.'},
+  {id:'di',q:'What is lazy initialization?',a:'<code>@Lazy</code> delays bean creation until first requested. Reduces startup time but may hide wiring errors until runtime. Set globally with <code>spring.main.lazy-initialization=true</code> in Spring Boot.'},
+  {id:'di',q:'What is lookup method injection?',a:'When a singleton needs a fresh prototype instance per method call, <code>@Lookup</code> on an abstract method makes Spring override it at runtime to return a new prototype bean on every invocation — bypassing the "singleton gets one prototype" limitation.'},
+
+  {id:'boot',q:'What is Spring Boot?',a:'Spring Boot is an opinionated extension of Spring that provides auto-configuration, embedded servers (Tomcat/Jetty/Undertow), starter dependencies, Actuator, and eliminates boilerplate XML/Java config. Run anywhere with <code>java -jar</code>.'},
+  {id:'boot',q:'What is Spring Boot auto-configuration?',a:'Auto-configuration automatically configures beans based on classpath JARs and your own config. Enabled by <code>@EnableAutoConfiguration</code> (included in <code>@SpringBootApplication</code>). Spring Boot reads <code>AutoConfiguration.imports</code> and applies classes conditionally.'},
+  {id:'boot',q:'What does @SpringBootApplication do?',a:'It combines three annotations: <code>@Configuration</code> (marks as config source), <code>@EnableAutoConfiguration</code> (enables auto-config), and <code>@ComponentScan</code> (component scanning from the annotated class\'s package).'},
+  {id:'boot',q:'What are Spring Boot starters?',a:'Starters are dependency descriptors bundling everything needed for a feature. <code>spring-boot-starter-web</code> includes Spring MVC, Jackson, and embedded Tomcat. They simplify Maven/Gradle config by grouping transitive dependencies.'},
+  {id:'boot',q:'application.properties vs application.yml?',a:'Both configure Spring Boot. <code>application.properties</code> uses flat key=value pairs. <code>application.yml</code> uses YAML\'s hierarchical structure — more readable for nested configs. Both support profiles (e.g., <code>application-dev.yml</code>).'},
+  {id:'boot',q:'What is Spring Boot Actuator?',a:'Actuator exposes production-ready operational information via HTTP/JMX endpoints: <code>/actuator/health</code>, <code>/actuator/metrics</code>, <code>/actuator/env</code>, <code>/actuator/beans</code>. Endpoints must be explicitly exposed in config.'},
+  {id:'boot',q:'What are Spring Boot profiles?',a:'Profiles define environment-specific configuration (dev, test, prod). Activate with <code>spring.profiles.active=dev</code>. Profile-specific files like <code>application-dev.yml</code> are auto-picked. Beans can use <code>@Profile("dev")</code> to load conditionally.'},
+  {id:'boot',q:'What is @ConfigurationProperties?',a:'Binds a group of properties to a typed POJO. <code>@ConfigurationProperties(prefix="app")</code> on a class with a <code>name</code> field binds <code>app.name</code>. Supports <code>@Validated</code>. More type-safe than <code>@Value</code> for related properties.'},
+  {id:'boot',q:"How does Spring Boot's embedded server work?",a:'Spring Boot packages an embedded Tomcat (or Jetty/Undertow) inside the fat JAR. Running <code>java -jar app.jar</code> starts the container programmatically during context initialization — no external server deployment needed.'},
+  {id:'boot',q:'CommandLineRunner vs ApplicationRunner?',a:'Both run code after the Spring context is fully loaded. <code>CommandLineRunner.run(String... args)</code> receives raw args. <code>ApplicationRunner.run(ApplicationArguments args)</code> receives parsed args. Useful for data initialization or startup checks.'},
+  {id:'boot',q:'What is Spring Boot DevTools?',a:'DevTools provides auto-restart on classpath changes, LiveReload integration (refreshes browser), and dev-optimized defaults (e.g., no template caching). Automatically excluded from production builds.'},
+
+  {id:'mvc',q:'What is Spring MVC?',a:'Spring MVC is a web framework built on the Servlet API following the MVC pattern. <code>DispatcherServlet</code> acts as the front controller, routing requests to <code>@Controller</code> methods, resolving views, and handling the full request-response lifecycle.'},
+  {id:'mvc',q:'What is DispatcherServlet?',a:'<code>DispatcherServlet</code> is the front controller. It receives all HTTP requests, consults <code>HandlerMapping</code> to find the right controller, delegates to it, then uses <code>ViewResolver</code> to render the response.'},
+  {id:'mvc',q:'@Controller vs @RestController?',a:'<code>@Controller</code> returns view names by default. <code>@RestController</code> = <code>@Controller</code> + <code>@ResponseBody</code> — every method serializes the return value directly to the HTTP response body (JSON/XML), not a view.'},
+  {id:'mvc',q:'@RequestMapping and HTTP method shortcuts?',a:'<code>@RequestMapping</code> maps requests specifying URL, method, params, headers. <code>@GetMapping</code>, <code>@PostMapping</code>, <code>@PutMapping</code>, <code>@DeleteMapping</code>, <code>@PatchMapping</code> are composed shortcuts.'},
+  {id:'mvc',q:'@PathVariable vs @RequestParam?',a:'<code>@PathVariable</code> extracts values from URI templates (<code>/users/{id}</code>). <code>@RequestParam</code> extracts query string params (<code>/users?page=1</code>). <code>@RequestParam</code> can be optional with a default value.'},
+  {id:'mvc',q:'@RequestBody and @ResponseBody?',a:'<code>@RequestBody</code> deserializes the HTTP request body into a Java object via <code>HttpMessageConverter</code>. <code>@ResponseBody</code> serializes the return value to the response body. Implicit on all methods with <code>@RestController</code>.'},
+  {id:'mvc',q:'What is ResponseEntity?',a:'<code>ResponseEntity&lt;T&gt;</code> represents the full HTTP response — status code, headers, and body. Gives fine-grained control: <code>return ResponseEntity.status(HttpStatus.CREATED).header("Location", uri).body(obj)</code>.'},
+  {id:'mvc',q:'@ExceptionHandler and @ControllerAdvice?',a:'<code>@ExceptionHandler</code> handles exceptions in a specific controller. <code>@ControllerAdvice</code> (or <code>@RestControllerAdvice</code>) applies globally across all controllers — centralized error handling.'},
+  {id:'mvc',q:'What is HandlerInterceptor?',a:'Similar to a servlet filter but tied to Spring MVC. Has <code>preHandle</code> (before handler), <code>postHandle</code> (after handler, before view render), and <code>afterCompletion</code> (always, like finally). Useful for logging, auth checks, locale setup.'},
+  {id:'mvc',q:'What is content negotiation?',a:'Determines response format from the <code>Accept</code> header, URL extension, or request parameter. Spring MVC uses <code>ContentNegotiationManager</code> to select the appropriate <code>HttpMessageConverter</code> — JSON or XML based on client preference.'},
+  {id:'mvc',q:'What is CORS and how to configure it?',a:'CORS allows controlled cross-origin requests. Configure per-controller with <code>@CrossOrigin</code>, or globally via <code>WebMvcConfigurer.addCorsMappings()</code>. Set allowed origins, methods, headers, and whether credentials are allowed.'},
+
+  {id:'data',q:'What is Spring Data JPA?',a:'Spring Data JPA simplifies JPA data access by auto-generating repository implementations, supporting derived query methods, pagination, sorting, and <code>@Query</code> for custom JPQL/native SQL. Sits on top of providers like Hibernate.'},
+  {id:'data',q:'What is the Repository hierarchy?',a:'<code>Repository</code> (marker) → <code>CrudRepository</code> (basic CRUD) → <code>PagingAndSortingRepository</code> (paging/sorting) → <code>JpaRepository</code> (JPA-specific: <code>flush()</code>, <code>saveAndFlush()</code>, batch deletion). Most repos extend <code>JpaRepository</code>.'},
+  {id:'data',q:'What are derived query methods?',a:'Spring Data generates queries from method names. <code>findByEmailAndAge(String email, int age)</code> generates the JPQL automatically. Keywords: <code>findBy</code>, <code>countBy</code>, <code>deleteBy</code>, <code>And</code>, <code>Or</code>, <code>Between</code>, <code>Like</code>, <code>OrderBy</code>, <code>IgnoreCase</code>, etc.'},
+  {id:'data',q:'What is @Query in Spring Data?',a:'Defines custom JPQL or native SQL on a repository method. JPQL: <code>@Query("SELECT u FROM User u WHERE u.email = ?1")</code>. Native: <code>@Query(value="SELECT * FROM users WHERE email=?", nativeQuery=true)</code>. Supports named params with <code>:paramName</code>.'},
+  {id:'data',q:'save() vs saveAndFlush()?',a:'<code>save()</code> may batch the SQL — not immediately sent to the DB. <code>saveAndFlush()</code> immediately flushes the persistence context, sending SQL to the DB in the current transaction. Useful when subsequent operations in the same transaction need the DB state updated.'},
+  {id:'data',q:'What is Pageable and Page?',a:'<code>Pageable</code> encapsulates page number, size, and sorting. Repository methods return <code>Page&lt;T&gt;</code> with content, total elements, total pages, and navigation info. Example: <code>PageRequest.of(0, 10, Sort.by("name"))</code>.'},
+  {id:'data',q:'What is the N+1 problem?',a:'Loading N entities triggers N additional queries for each entity\'s lazy association. Fix with <code>@EntityGraph</code> to specify eager loading per query, <code>JOIN FETCH</code> in <code>@Query</code>, or appropriate fetch type configuration globally.'},
+  {id:'data',q:'What is @Modifying?',a:'Required with <code>@Query</code> for UPDATE/DELETE statements. Tells Spring Data the query modifies data. Also requires <code>@Transactional</code>. May need <code>clearAutomatically=true</code> to sync the persistence context after the modification.'},
+  {id:'data',q:'What is @Entity and @Table?',a:'<code>@Entity</code> marks a JPA persistent class. <code>@Table(name="users")</code> specifies the table name. The entity needs a no-arg constructor and an <code>@Id</code> field. <code>@Column</code> customizes column mappings (name, nullable, length, unique).'},
+  {id:'data',q:"What are Spring Data's auditing features?",a:'<code>@CreatedDate</code>, <code>@LastModifiedDate</code>, <code>@CreatedBy</code>, <code>@LastModifiedBy</code> auto-populate audit fields. Enable with <code>@EnableJpaAuditing</code>. Provide <code>AuditorAware</code> for current user. Entity needs <code>@EntityListeners(AuditingEntityListener.class)</code>.'},
+  {id:'data',q:'JPQL vs native SQL in Spring Data?',a:'JPQL operates on entity objects — database-independent. Native SQL operates on DB tables — DB-specific but can use DB functions. Use <code>@Query</code> with <code>nativeQuery=true</code> for native SQL. May need <code>@SqlResultSetMapping</code> for complex mappings.'},
+
+  {id:'sec',q:'What is Spring Security?',a:'A powerful authentication and access-control framework. It integrates with the Servlet filter chain to intercept requests and enforce security rules before they reach your application. Supports password auth, OAuth2/OIDC, JWT, LDAP, and more.'},
+  {id:'sec',q:"How does Spring Security's filter chain work?",a:'<code>DelegatingFilterProxy</code> delegates to <code>FilterChainProxy</code>, which manages multiple <code>SecurityFilterChain</code> instances. Each chain has ordered security filters (e.g., <code>UsernamePasswordAuthenticationFilter</code>, <code>JwtFilter</code>) applied to matching requests.'},
+  {id:'sec',q:'Authentication vs Authorization?',a:'Authentication verifies identity (who are you?). Authorization determines access (what can you do?). The authenticated user is stored in <code>SecurityContext</code> as an <code>Authentication</code> object containing principal, credentials, and granted authorities.'},
+  {id:'sec',q:'What is UserDetailsService?',a:'Core interface for loading user-specific data during authentication. <code>loadUserByUsername(String username)</code> returns a <code>UserDetails</code> object. Implement it to load users from your database.'},
+  {id:'sec',q:'What is PasswordEncoder?',a:'Hashes passwords before storing and verifies raw passwords against hashes. <code>BCryptPasswordEncoder</code> is recommended — uses bcrypt with random salt and configurable work factor. Use <code>DelegatingPasswordEncoder</code> for migration. Never store plain-text passwords.'},
+  {id:'sec',q:'@PreAuthorize and @PostAuthorize?',a:'<code>@PreAuthorize</code> checks a SpEL expression before method execution: <code>@PreAuthorize("hasRole(\'ADMIN\')")</code>. <code>@PostAuthorize</code> checks after and can reference <code>returnObject</code>. Enable with <code>@EnableMethodSecurity</code>.'},
+  {id:'sec',q:'What is CSRF and how does Spring handle it?',a:'CSRF tricks users into submitting unwanted requests. Spring Security uses a synchronizer token pattern for state-changing methods. For stateless REST APIs (JWT-based), CSRF is typically disabled since no session is used.'},
+  {id:'sec',q:'What is OAuth2 in Spring Security?',a:'Full OAuth2 support as resource server (validates JWT/opaque tokens) or client (manages obtaining/refreshing tokens). <code>spring-boot-starter-oauth2-resource-server</code> with <code>spring.security.oauth2.resourceserver.jwt.issuer-uri</code> sets up JWT validation automatically.'},
+  {id:'sec',q:'What is SecurityContextHolder?',a:'Stores the <code>SecurityContext</code> for the current thread (default: <code>ThreadLocal</code> strategy). Access via <code>SecurityContextHolder.getContext().getAuthentication()</code>. Cleared after each request in the filter chain.'},
+  {id:'sec',q:'hasRole() vs hasAuthority()?',a:'<code>hasRole("ADMIN")</code> auto-prepends <code>ROLE_</code> — checks for <code>ROLE_ADMIN</code>. <code>hasAuthority("ROLE_ADMIN")</code> checks the exact string. For fine-grained permissions like <code>READ_PRIVILEGE</code>, use <code>hasAuthority</code>.'},
+  {id:'sec',q:'What is JWT validation in Spring Security?',a:'<code>JwtDecoder</code> fetches the issuer\'s JWK Set and validates the token\'s signature, expiry, and claims on every request. Configured automatically with <code>spring.security.oauth2.resourceserver.jwt.issuer-uri</code>.'},
+
+  {id:'aop',q:'What is AOP (Aspect-Oriented Programming)?',a:'AOP separates cross-cutting concerns (logging, security, transactions, caching) from business logic. Spring AOP uses JDK dynamic proxies (for interfaces) or CGLIB proxies (for classes) to weave advice into execution flow.'},
+  {id:'aop',q:'What are the key AOP terms?',a:'<strong>Aspect</strong> — the cross-cutting concern module. <strong>Advice</strong> — action to take. <strong>Pointcut</strong> — where to apply. <strong>JoinPoint</strong> — point during execution. <strong>Weaving</strong> — linking aspects with objects. <strong>Target object</strong> — the bean being advised.'},
+  {id:'aop',q:'Types of advice in Spring AOP?',a:'<code>@Before</code> (before method), <code>@AfterReturning</code> (after successful return), <code>@AfterThrowing</code> (after exception), <code>@After</code> (always, like finally), <code>@Around</code> (surrounds method — most powerful, must call <code>proceed()</code>).'},
+  {id:'aop',q:'What is a Pointcut expression?',a:'Defines which join points to advise. The <code>execution</code> designator: <code>execution(* com.example.service.*.*(..))</code> matches all service methods. Other designators: <code>@annotation()</code>, <code>within()</code>, <code>bean()</code>.'},
+  {id:'aop',q:'What is @Around and ProceedingJoinPoint?',a:'<code>@Around</code> wraps a method. The advice receives a <code>ProceedingJoinPoint</code> and must call <code>pjp.proceed()</code>. Can modify args, catch exceptions, modify return values, or prevent the original method from executing entirely.'},
+  {id:'aop',q:'Spring AOP vs AspectJ?',a:'Spring AOP: proxy-based, runtime weaving, only method execution join points, Spring-managed beans only. AspectJ: full framework, compile/load-time weaving, all join point types (field access, constructors). Spring can integrate AspectJ via <code>@EnableLoadTimeWeaving</code>.'},
+  {id:'aop',q:'What is @EnableAspectJAutoProxy?',a:'Enables Spring support for <code>@Aspect</code> components and auto-creates proxies. Auto-configured in Spring Boot with <code>spring-boot-starter-aop</code>. Set <code>proxyTargetClass=true</code> to force CGLIB even for classes implementing interfaces.'},
+  {id:'aop',q:'What are proxy limitations in Spring AOP?',a:'Only method-level join points. Self-invocations (calling <code>this.method()</code>) bypass the proxy — advice doesn\'t apply. <code>final</code> classes/methods can\'t be CGLIB-proxied. Advice applies only to Spring-managed beans.'},
+
+  {id:'tx',q:'What is @Transactional?',a:'Marks a method/class to run in a transaction. Spring proxy begins a transaction before and commits/rolls back after. Key attributes: <code>propagation</code>, <code>isolation</code>, <code>readOnly</code>, <code>timeout</code>, <code>rollbackFor</code>, <code>noRollbackFor</code>.'},
+  {id:'tx',q:'Transaction propagation types?',a:'<code>REQUIRED</code> (default — join or create), <code>REQUIRES_NEW</code> (always new, suspend existing), <code>SUPPORTS</code> (join if exists), <code>MANDATORY</code> (must exist), <code>NEVER</code> (must not exist), <code>NOT_SUPPORTED</code> (suspend existing), <code>NESTED</code> (nested savepoint).'},
+  {id:'tx',q:'Transaction isolation levels?',a:'<code>READ_UNCOMMITTED</code> (dirty reads allowed), <code>READ_COMMITTED</code> (default in most DBs), <code>REPEATABLE_READ</code> (no dirty/non-repeatable reads), <code>SERIALIZABLE</code> (strongest — no phantom reads). Higher isolation = more locking overhead.'},
+  {id:'tx',q:'When does @Transactional NOT roll back?',a:'Only rolls back for unchecked exceptions (<code>RuntimeException</code>, <code>Error</code>) by default. Checked exceptions require <code>rollbackFor=IOException.class</code>. Self-invocations bypass the proxy so <code>@Transactional</code> has no effect.'},
+  {id:'tx',q:'What is the readOnly flag?',a:'<code>@Transactional(readOnly=true)</code> hints to skip dirty checking (Hibernate optimization) and may route to read replicas. An optimization hint — doesn\'t prevent writes at the application level.'},
+  {id:'tx',q:'Optimistic vs pessimistic locking?',a:'<strong>Optimistic</strong>: <code>@Version</code> field checked on update — throws <code>OptimisticLockException</code> on conflict. Low contention. <strong>Pessimistic</strong>: <code>@Lock(LockModeType.PESSIMISTIC_WRITE)</code> acquires a DB lock immediately — prevents concurrent modification but reduces throughput.'},
+
+  {id:'cloud',q:'What is Spring Cloud?',a:'Tools for building distributed systems and microservices: service discovery (Eureka), load balancing (Spring Cloud LoadBalancer), API gateway (Spring Cloud Gateway), config (Spring Cloud Config), circuit breakers (Resilience4j), distributed tracing (Micrometer + Zipkin).'},
+  {id:'cloud',q:'What is Spring Cloud Config?',a:'Server + client support for externalized configuration. Config Server reads from Git (or other backends) and exposes configs as REST. Client apps fetch config on startup and can refresh dynamically via Spring Cloud Bus + <code>/actuator/refresh</code>.'},
+  {id:'cloud',q:'What is Eureka?',a:'Netflix service registry. Microservices register themselves and send heartbeats. Clients discover instances by service name instead of hardcoding URLs. Use <code>@EnableEurekaServer</code> and <code>@EnableDiscoveryClient</code>.'},
+  {id:'cloud',q:'What is a Circuit Breaker?',a:'Prevents cascading failures. When a service fails repeatedly, the circuit opens and returns a fallback instead of timing out. Resilience4j\'s <code>@CircuitBreaker</code> annotation. States: CLOSED (normal) → OPEN (failing) → HALF-OPEN (testing recovery).'},
+  {id:'cloud',q:'What is Spring Cloud Gateway?',a:'Reactive API gateway built on WebFlux. Routes requests to downstream services with cross-cutting features: auth, rate limiting, circuit breaking, request/response transformation via a predicate + filter pipeline. Replaces Netflix Zuul.'},
+  {id:'cloud',q:'What is OpenFeign?',a:'Declarative REST client. Define an interface with <code>@FeignClient(name="user-service")</code> and annotate methods with MVC annotations. Spring generates the implementation using service discovery + load balancing. Simpler than <code>RestTemplate</code> or <code>WebClient</code>.'},
+  {id:'cloud',q:'What is distributed tracing?',a:'Correlates logs/metrics across services. Each request gets a <code>traceId</code> (full request) and <code>spanId</code> (per hop) propagated in HTTP headers. Spring Boot 3.x uses Micrometer Tracing, exportable to Zipkin or Jaeger.'},
+  {id:'cloud',q:'RestTemplate vs WebClient?',a:'<code>RestTemplate</code> is synchronous/blocking — deprecated. <code>WebClient</code> is non-blocking and reactive — usable in both reactive and servlet-based apps. Supports streaming, retries, backpressure. Prefer <code>WebClient</code> for all new code.'},
+
+  {id:'test',q:'What is @SpringBootTest?',a:'Loads the full Spring ApplicationContext for integration testing. Default: no HTTP server. Use <code>webEnvironment=RANDOM_PORT</code> for a real server or <code>MOCK</code> for a mocked servlet environment. Heavier than slice tests.'},
+  {id:'test',q:'What are Spring test slices?',a:'<code>@WebMvcTest</code> (MVC layer only), <code>@DataJpaTest</code> (JPA with in-memory DB), <code>@JsonTest</code> (JSON serialization), <code>@WebFluxTest</code> (WebFlux layer). Faster, more focused than <code>@SpringBootTest</code> — load only what\'s needed.'},
+  {id:'test',q:'What is MockMvc?',a:'Tests Spring MVC controllers without starting a full HTTP server. Simulates requests through <code>DispatcherServlet</code>. Example: <code>mockMvc.perform(get("/api/users")).andExpect(status().isOk()).andExpect(jsonPath("$.name").value("Alice"))</code>.'},
+  {id:'test',q:'What is @MockBean?',a:'Creates a Mockito mock and adds it to the Spring context, replacing any existing bean of the same type. <code>@SpyBean</code> wraps a real bean — stubs only specific methods while real implementations run for others.'},
+  {id:'test',q:'TestRestTemplate vs WebTestClient?',a:'<code>TestRestTemplate</code> is synchronous, used with <code>RANDOM_PORT</code> tests. <code>WebTestClient</code> supports fluent assertions and is the preferred client in Spring Boot 3.x — works for both reactive and servlet apps.'},
+  {id:'test',q:'What is @Sql?',a:'Runs SQL scripts before/after a test. <code>@Sql("/insert-test-data.sql")</code>. Use <code>executionPhase=AFTER_TEST_METHOD</code> for cleanup. <code>@SqlGroup</code> allows multiple <code>@Sql</code> annotations. Pairs well with <code>@DataJpaTest</code>.'},
+  {id:'test',q:'How to test @Async methods?',a:'Call <code>.get()</code> on the returned <code>Future</code>/<code>CompletableFuture</code> to block. Or use <code>@SpyBean</code> with <code>ArgumentCaptor</code>. For unit tests, test the synchronous logic directly and test the async wrapper separately.'},
+  {id:'test',q:'What is @DataJpaTest?',a:'Slice test for JPA repositories. Auto-configures in-memory H2, scans <code>@Entity</code> classes and JPA repos, and wraps each test in a rolled-back transaction. Use <code>excludeAutoConfiguration</code> for unneeded parts.'},
+  {id:'test',q:'What is Testcontainers?',a:'Java library providing throwaway Docker containers for integration tests. With Spring Boot 3.1+ <code>@ServiceConnection</code>, declaring a container (e.g., <code>PostgreSQLContainer</code>) auto-configures the datasource — no manual property overrides needed.'},
+  {id:'test',q:'Unit tests vs integration tests?',a:'Unit tests test a single class in isolation with mocked deps — no Spring context, just JUnit + Mockito. Integration tests use a Spring context and test multiple components together. Aim for a test pyramid: many unit, fewer integration, few E2E tests.'},
+  {id:'test',q:'What is @TestConfiguration?',a:'Defines beans only for tests — not picked up by main app scanning. Use to override beans or provide test-specific implementations. Unlike <code>@Configuration</code>, it won\'t interfere with the main application context.'},
+];
+
+const tagMap = {
+  core:'Core Spring', di:'DI', boot:'Spring Boot', mvc:'Spring MVC',
+  data:'Spring Data', sec:'Security', aop:'AOP', tx:'Transactions',
+  cloud:'Spring Cloud', test:'Testing'
+};
+
+let activeTopic = 'all';
+let allOpen = false;
+let openSet = new Set();
+
+// Build pills
+const pillsEl = document.getElementById('pills');
+TOPICS.forEach(t => {
+  const b = document.createElement('button');
+  b.className = 'pill' + (t.id === 'all' ? ' active' : '');
+  b.textContent = t.label;
+  b.onclick = () => {
+    activeTopic = t.id;
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    b.classList.add('active');
+    render();
+  };
+  pillsEl.appendChild(b);
+});
+
+function filtered() {
+  const s = document.getElementById('search').value.toLowerCase().trim();
+  return Q.filter((q, i) => {
+    const topicMatch = activeTopic === 'all' || q.id === activeTopic;
+    const textMatch = !s || q.q.toLowerCase().includes(s) || q.a.toLowerCase().includes(s);
+    return topicMatch && textMatch;
+  });
+}
+
+function toggleAll() {
+  const f = filtered();
+  allOpen = !allOpen;
+  if (allOpen) f.forEach((_, i) => openSet.add(Q.indexOf(f[i])));
+  else openSet.clear();
+  document.querySelector('.expand-btn').textContent = allOpen ? 'Collapse all' : 'Expand all';
+  render();
+}
+
+function render() {
+  const f = filtered();
+  document.getElementById('stats').textContent = `Showing ${f.length} of ${Q.length} questions`;
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+  if (!f.length) {
+    list.innerHTML = '<div class="empty">No questions match your search.</div>';
+    return;
+  }
+  f.forEach((item, fi) => {
+    const origIdx = Q.indexOf(item);
+    const isOpen = openSet.has(origIdx);
+    const div = document.createElement('div');
+    div.className = 'qcard' + (isOpen ? ' open' : '');
+    div.style.animationDelay = (fi * 18) + 'ms';
+    div.innerHTML = `
+      <div class="qhead" onclick="toggle(${origIdx})">
+        <span class="qnum">${String(origIdx+1).padStart(2,'0')}</span>
+        <span class="qtxt">${item.q}</span>
+        <span class="qtag tag-${item.id}">${tagMap[item.id]}</span>
+        <svg class="chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="qbody${isOpen?' show':''}">${item.a}</div>`;
+    list.appendChild(div);
+  });
+}
+
+function toggle(idx) {
+  const card=[...document.querySelectorAll('.qcard')].find(c=>c.querySelector('.qhead').getAttribute('onclick')===`toggle(${idx})`);
+  if(openSet.has(idx)) openSet.delete(idx); else openSet.add(idx);
+  if(card){
+    card.classList.toggle('open');
+    card.querySelector('.qbody').classList.toggle('show');
+  }
+}
+
+// Scroll-to-top button
+window.addEventListener('scroll', () => {
+  const btn = document.getElementById('scrollTop');
+  btn.classList.toggle('visible', window.scrollY > 400);
+});
+
+render();
+</script>
+</body>
+</html>
