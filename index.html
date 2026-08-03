@@ -5873,42 +5873,2978 @@ Spring automatically creates a <code>JwtDecoder</code> that validates every inco
 </ul>
 `
 },
-  {id:'aop',q:'What is AOP (Aspect-Oriented Programming)?',a:'AOP separates cross-cutting concerns (logging, security, transactions, caching) from business logic. Spring AOP uses JDK dynamic proxies (for interfaces) or CGLIB proxies (for classes) to weave advice into execution flow.'},
-  {id:'aop',q:'What are the key AOP terms?',a:'<strong>Aspect</strong> — the cross-cutting concern module. <strong>Advice</strong> — action to take. <strong>Pointcut</strong> — where to apply. <strong>JoinPoint</strong> — point during execution. <strong>Weaving</strong> — linking aspects with objects. <strong>Target object</strong> — the bean being advised.'},
-  {id:'aop',q:'Types of advice in Spring AOP?',a:'<code>@Before</code> (before method), <code>@AfterReturning</code> (after successful return), <code>@AfterThrowing</code> (after exception), <code>@After</code> (always, like finally), <code>@Around</code> (surrounds method — most powerful, must call <code>proceed()</code>).'},
-  {id:'aop',q:'What is a Pointcut expression?',a:'Defines which join points to advise. The <code>execution</code> designator: <code>execution(* com.example.service.*.*(..))</code> matches all service methods. Other designators: <code>@annotation()</code>, <code>within()</code>, <code>bean()</code>.'},
-  {id:'aop',q:'What is @Around and ProceedingJoinPoint?',a:'<code>@Around</code> wraps a method. The advice receives a <code>ProceedingJoinPoint</code> and must call <code>pjp.proceed()</code>. Can modify args, catch exceptions, modify return values, or prevent the original method from executing entirely.'},
-  {id:'aop',q:'Spring AOP vs AspectJ?',a:'Spring AOP: proxy-based, runtime weaving, only method execution join points, Spring-managed beans only. AspectJ: full framework, compile/load-time weaving, all join point types (field access, constructors). Spring can integrate AspectJ via <code>@EnableLoadTimeWeaving</code>.'},
-  {id:'aop',q:'What is @EnableAspectJAutoProxy?',a:'Enables Spring support for <code>@Aspect</code> components and auto-creates proxies. Auto-configured in Spring Boot with <code>spring-boot-starter-aop</code>. Set <code>proxyTargetClass=true</code> to force CGLIB even for classes implementing interfaces.'},
-  {id:'aop',q:'What are proxy limitations in Spring AOP?',a:'Only method-level join points. Self-invocations (calling <code>this.method()</code>) bypass the proxy — advice doesn\'t apply. <code>final</code> classes/methods can\'t be CGLIB-proxied. Advice applies only to Spring-managed beans.'},
+{
+    id: 'aop',
+    q: 'What is AOP (Aspect-Oriented Programming)?',
+    a: `
+<h3>📖 Definition</h3>
 
-  {id:'tx',q:'What is @Transactional?',a:'Marks a method/class to run in a transaction. Spring proxy begins a transaction before and commits/rolls back after. Key attributes: <code>propagation</code>, <code>isolation</code>, <code>readOnly</code>, <code>timeout</code>, <code>rollbackFor</code>, <code>noRollbackFor</code>.'},
-  {id:'tx',q:'Transaction propagation types?',a:'<code>REQUIRED</code> (default — join or create), <code>REQUIRES_NEW</code> (always new, suspend existing), <code>SUPPORTS</code> (join if exists), <code>MANDATORY</code> (must exist), <code>NEVER</code> (must not exist), <code>NOT_SUPPORTED</code> (suspend existing), <code>NESTED</code> (nested savepoint).'},
-  {id:'tx',q:'Transaction isolation levels?',a:'<code>READ_UNCOMMITTED</code> (dirty reads allowed), <code>READ_COMMITTED</code> (default in most DBs), <code>REPEATABLE_READ</code> (no dirty/non-repeatable reads), <code>SERIALIZABLE</code> (strongest — no phantom reads). Higher isolation = more locking overhead.'},
-  {id:'tx',q:'When does @Transactional NOT roll back?',a:'Only rolls back for unchecked exceptions (<code>RuntimeException</code>, <code>Error</code>) by default. Checked exceptions require <code>rollbackFor=IOException.class</code>. Self-invocations bypass the proxy so <code>@Transactional</code> has no effect.'},
-  {id:'tx',q:'What is the readOnly flag?',a:'<code>@Transactional(readOnly=true)</code> hints to skip dirty checking (Hibernate optimization) and may route to read replicas. An optimization hint — doesn\'t prevent writes at the application level.'},
-  {id:'tx',q:'Optimistic vs pessimistic locking?',a:'<strong>Optimistic</strong>: <code>@Version</code> field checked on update — throws <code>OptimisticLockException</code> on conflict. Low contention. <strong>Pessimistic</strong>: <code>@Lock(LockModeType.PESSIMISTIC_WRITE)</code> acquires a DB lock immediately — prevents concurrent modification but reduces throughput.'},
+<p>
+<strong>Aspect-Oriented Programming (AOP)</strong> is a programming paradigm that separates <strong>cross-cutting concerns</strong> from the main business logic of an application.
+</p>
 
-  {id:'cloud',q:'What is Spring Cloud?',a:'Tools for building distributed systems and microservices: service discovery (Eureka), load balancing (Spring Cloud LoadBalancer), API gateway (Spring Cloud Gateway), config (Spring Cloud Config), circuit breakers (Resilience4j), distributed tracing (Micrometer + Zipkin).'},
-  {id:'cloud',q:'What is Spring Cloud Config?',a:'Server + client support for externalized configuration. Config Server reads from Git (or other backends) and exposes configs as REST. Client apps fetch config on startup and can refresh dynamically via Spring Cloud Bus + <code>/actuator/refresh</code>.'},
-  {id:'cloud',q:'What is Eureka?',a:'Netflix service registry. Microservices register themselves and send heartbeats. Clients discover instances by service name instead of hardcoding URLs. Use <code>@EnableEurekaServer</code> and <code>@EnableDiscoveryClient</code>.'},
-  {id:'cloud',q:'What is a Circuit Breaker?',a:'Prevents cascading failures. When a service fails repeatedly, the circuit opens and returns a fallback instead of timing out. Resilience4j\'s <code>@CircuitBreaker</code> annotation. States: CLOSED (normal) → OPEN (failing) → HALF-OPEN (testing recovery).'},
-  {id:'cloud',q:'What is Spring Cloud Gateway?',a:'Reactive API gateway built on WebFlux. Routes requests to downstream services with cross-cutting features: auth, rate limiting, circuit breaking, request/response transformation via a predicate + filter pipeline. Replaces Netflix Zuul.'},
-  {id:'cloud',q:'What is OpenFeign?',a:'Declarative REST client. Define an interface with <code>@FeignClient(name="user-service")</code> and annotate methods with MVC annotations. Spring generates the implementation using service discovery + load balancing. Simpler than <code>RestTemplate</code> or <code>WebClient</code>.'},
-  {id:'cloud',q:'What is distributed tracing?',a:'Correlates logs/metrics across services. Each request gets a <code>traceId</code> (full request) and <code>spanId</code> (per hop) propagated in HTTP headers. Spring Boot 3.x uses Micrometer Tracing, exportable to Zipkin or Jaeger.'},
-  {id:'cloud',q:'RestTemplate vs WebClient?',a:'<code>RestTemplate</code> is synchronous/blocking — deprecated. <code>WebClient</code> is non-blocking and reactive — usable in both reactive and servlet-based apps. Supports streaming, retries, backpressure. Prefer <code>WebClient</code> for all new code.'},
+<p>
+A cross-cutting concern is functionality that is needed in multiple parts of an application, such as logging, security, transactions, exception handling, caching, and auditing.
+</p>
 
-  {id:'test',q:'What is @SpringBootTest?',a:'Loads the full Spring ApplicationContext for integration testing. Default: no HTTP server. Use <code>webEnvironment=RANDOM_PORT</code> for a real server or <code>MOCK</code> for a mocked servlet environment. Heavier than slice tests.'},
-  {id:'test',q:'What are Spring test slices?',a:'<code>@WebMvcTest</code> (MVC layer only), <code>@DataJpaTest</code> (JPA with in-memory DB), <code>@JsonTest</code> (JSON serialization), <code>@WebFluxTest</code> (WebFlux layer). Faster, more focused than <code>@SpringBootTest</code> — load only what\'s needed.'},
-  {id:'test',q:'What is MockMvc?',a:'Tests Spring MVC controllers without starting a full HTTP server. Simulates requests through <code>DispatcherServlet</code>. Example: <code>mockMvc.perform(get("/api/users")).andExpect(status().isOk()).andExpect(jsonPath("$.name").value("Alice"))</code>.'},
-  {id:'test',q:'What is @MockBean?',a:'Creates a Mockito mock and adds it to the Spring context, replacing any existing bean of the same type. <code>@SpyBean</code> wraps a real bean — stubs only specific methods while real implementations run for others.'},
-  {id:'test',q:'TestRestTemplate vs WebTestClient?',a:'<code>TestRestTemplate</code> is synchronous, used with <code>RANDOM_PORT</code> tests. <code>WebTestClient</code> supports fluent assertions and is the preferred client in Spring Boot 3.x — works for both reactive and servlet apps.'},
-  {id:'test',q:'What is @Sql?',a:'Runs SQL scripts before/after a test. <code>@Sql("/insert-test-data.sql")</code>. Use <code>executionPhase=AFTER_TEST_METHOD</code> for cleanup. <code>@SqlGroup</code> allows multiple <code>@Sql</code> annotations. Pairs well with <code>@DataJpaTest</code>.'},
-  {id:'test',q:'How to test @Async methods?',a:'Call <code>.get()</code> on the returned <code>Future</code>/<code>CompletableFuture</code> to block. Or use <code>@SpyBean</code> with <code>ArgumentCaptor</code>. For unit tests, test the synchronous logic directly and test the async wrapper separately.'},
-  {id:'test',q:'What is @DataJpaTest?',a:'Slice test for JPA repositories. Auto-configures in-memory H2, scans <code>@Entity</code> classes and JPA repos, and wraps each test in a rolled-back transaction. Use <code>excludeAutoConfiguration</code> for unneeded parts.'},
-  {id:'test',q:'What is Testcontainers?',a:'Java library providing throwaway Docker containers for integration tests. With Spring Boot 3.1+ <code>@ServiceConnection</code>, declaring a container (e.g., <code>PostgreSQLContainer</code>) auto-configures the datasource — no manual property overrides needed.'},
-  {id:'test',q:'Unit tests vs integration tests?',a:'Unit tests test a single class in isolation with mocked deps — no Spring context, just JUnit + Mockito. Integration tests use a Spring context and test multiple components together. Aim for a test pyramid: many unit, fewer integration, few E2E tests.'},
-  {id:'test',q:'What is @TestConfiguration?',a:'Defines beans only for tests — not picked up by main app scanning. Use to override beans or provide test-specific implementations. Unlike <code>@Configuration</code>, it won\'t interfere with the main application context.'},
+<p>
+Instead of writing the same code in multiple classes, AOP allows you to write it once and automatically apply it wherever required.
+</p>
+
+<h3>🤔 Why do we need AOP?</h3>
+
+<ul>
+<li>Remove duplicate code.</li>
+<li>Keep business logic clean.</li>
+<li>Improve maintainability.</li>
+<li>Apply common functionality across multiple classes.</li>
+<li>Increase code reusability.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>A client calls a Spring Bean.</li>
+<li>Instead of calling the Bean directly, Spring creates a Proxy.</li>
+<li>The Proxy executes the Aspect (logging, security, etc.).</li>
+<li>The Proxy invokes the actual business method.</li>
+<li>The Proxy can also execute logic after the method finishes.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Business Service</strong></p>
+
+<pre><code>@Service
+public class ProductService {
+
+    public void saveProduct() {
+
+        System.out.println("Saving Product");
+
+    }
+
+}
+</code></pre>
+
+<p><strong>Logging Aspect</strong></p>
+
+<pre><code>@Aspect
+@Component
+public class LoggingAspect {
+
+    @Before("execution(* com.example.service.*.*(..))")
+    public void log() {
+
+        System.out.println("Method Started");
+
+    }
+
+}
+</code></pre>
+
+<p>
+Whenever any service method executes, the logging code runs automatically before the method.
+</p>
+
+<h3>⭐ Common Cross-Cutting Concerns</h3>
+
+<ul>
+<li>Logging</li>
+<li>Security</li>
+<li>Transactions</li>
+<li>Caching</li>
+<li>Auditing</li>
+<li>Performance Monitoring</li>
+</ul>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>AOP separates cross-cutting concerns from business logic.</li>
+<li>Spring AOP works using proxies.</li>
+<li>Reduces duplicate code.</li>
+<li>Improves code maintainability.</li>
+</ul>
+`
+},
+
+{
+    id: 'aop',
+    q: 'What are the key AOP terms?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Spring AOP uses several important terms that describe how aspects are applied to application methods.
+</p>
+
+<h3>⚙️ Key AOP Terms</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Term</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td><strong>Aspect</strong></td>
+<td>A class containing cross-cutting logic such as logging or security.</td>
+</tr>
+
+<tr>
+<td><strong>Advice</strong></td>
+<td>The action performed by an Aspect before, after, or around a method.</td>
+</tr>
+
+<tr>
+<td><strong>Join Point</strong></td>
+<td>A point during program execution where an Aspect can be applied. In Spring AOP, this is always a method execution.</td>
+</tr>
+
+<tr>
+<td><strong>Pointcut</strong></td>
+<td>An expression that selects which methods should execute the Advice.</td>
+</tr>
+
+<tr>
+<td><strong>Target Object</strong></td>
+<td>The original Spring Bean whose methods are being intercepted.</td>
+</tr>
+
+<tr>
+<td><strong>Proxy</strong></td>
+<td>The object created by Spring that intercepts method calls and executes the Advice.</td>
+</tr>
+
+<tr>
+<td><strong>Weaving</strong></td>
+<td>The process of connecting Aspects with application code.</td>
+</tr>
+
+</table>
+
+<h3>⚙️ Relationship</h3>
+
+<pre><code>
+Aspect
+   │
+Contains
+   ▼
+Advice
+   │
+Applied Using
+   ▼
+Pointcut
+   │
+Intercepts
+   ▼
+Join Point
+   │
+On
+   ▼
+Target Object
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Aspect
+@Component
+public class LoggingAspect {
+
+    @Before(
+      "execution(* com.example.service.*.*(..))"
+    )
+    public void log() {
+
+        System.out.println("Logging...");
+
+    }
+
+}
+</code></pre>
+
+<p>
+Here:</p>
+
+<ul>
+<li>Aspect → <code>LoggingAspect</code></li>
+<li>Advice → <code>log()</code></li>
+<li>Pointcut → <code>execution(...)</code></li>
+<li>Join Point → Service method execution</li>
+<li>Target Object → Service Bean</li>
+</ul>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Aspect contains Advice.</li>
+<li>Pointcut selects Join Points.</li>
+<li>Advice executes at Join Points.</li>
+<li>Spring creates a Proxy around the Target Object.</li>
+</ul>
+`
+},
+
+{
+    id: 'aop',
+    q: 'Types of Advice in Spring AOP',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+An <strong>Advice</strong> is the action that Spring executes at a particular Join Point. Spring AOP provides five types of Advice based on when the code should execute.
+</p>
+
+<h3>⚙️ Types of Advice</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Advice</th>
+<th>When it Executes</th>
+</tr>
+
+<tr>
+<td><code>@Before</code></td>
+<td>Before the target method executes.</td>
+</tr>
+
+<tr>
+<td><code>@AfterReturning</code></td>
+<td>After the method completes successfully.</td>
+</tr>
+
+<tr>
+<td><code>@AfterThrowing</code></td>
+<td>Only if the method throws an exception.</td>
+</tr>
+
+<tr>
+<td><code>@After</code></td>
+<td>Always executes after the method (similar to finally).</td>
+</tr>
+
+<tr>
+<td><code>@Around</code></td>
+<td>Executes before and after the method. Can even stop or modify method execution.</td>
+</tr>
+
+</table>
+
+<h3>⚙️ Execution Flow</h3>
+
+<pre><code>
+@Before
+    │
+    ▼
+Business Method
+    │
+ ┌──┴─────────────┐
+ │                │
+ ▼                ▼
+Success       Exception
+ │                │
+ ▼                ▼
+@AfterReturning  @AfterThrowing
+        │
+        ▼
+      @After
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Aspect
+@Component
+public class LoggingAspect {
+
+    @Before("execution(* com.example.service.*.*(..))")
+    public void before() {
+
+    }
+
+    @AfterReturning(
+        "execution(* com.example.service.*.*(..))")
+    public void success() {
+
+    }
+
+    @AfterThrowing(
+        "execution(* com.example.service.*.*(..))")
+    public void exception() {
+
+    }
+
+    @After(
+        "execution(* com.example.service.*.*(..))")
+    public void after() {
+
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li><code>@Before</code> → Before method execution.</li>
+<li><code>@AfterReturning</code> → After successful execution.</li>
+<li><code>@AfterThrowing</code> → After an exception.</li>
+<li><code>@After</code> → Always executes.</li>
+<li><code>@Around</code> → Most powerful Advice.</li>
+</ul>
+`
+},
+{
+    id: 'aop',
+    q: 'What is a Pointcut Expression?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+A <strong>Pointcut</strong> is an expression that tells Spring AOP <strong>which methods should be intercepted</strong> by an Aspect. It defines where an Advice should be applied.
+</p>
+
+<p>
+Without a Pointcut, Spring would not know which methods should execute the Advice.
+</p>
+
+<h3>🤔 Why do we need Pointcuts?</h3>
+
+<ul>
+<li>Select specific methods for Advice.</li>
+<li>Avoid applying Advice to every method.</li>
+<li>Target packages, classes, methods, or annotations.</li>
+<li>Keep AOP flexible and reusable.</li>
+</ul>
+
+<h3>⚙️ Common Pointcut Designators</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Designator</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td><code>execution()</code></td>
+<td>Matches method execution.</td>
+</tr>
+
+<tr>
+<td><code>within()</code></td>
+<td>Matches all methods inside a class or package.</td>
+</tr>
+
+<tr>
+<td><code>@annotation()</code></td>
+<td>Matches methods having a specific annotation.</td>
+</tr>
+
+<tr>
+<td><code>bean()</code></td>
+<td>Matches a Spring Bean by name.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>All Service Methods</strong></p>
+
+<pre><code>@Before(
+"execution(* com.example.service.*.*(..))"
+)
+public void log() {
+
+    System.out.println("Method Called");
+
+}
+</code></pre>
+
+<p><strong>Specific Method</strong></p>
+
+<pre><code>@Before(
+"execution(* ProductService.saveProduct(..))"
+)
+public void log() {
+
+}
+</code></pre>
+
+<p><strong>Using Annotation</strong></p>
+
+<pre><code>@Before("@annotation(LogExecution)")
+public void log() {
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Pointcuts decide where Advice executes.</li>
+<li><code>execution()</code> is the most commonly used expression.</li>
+<li>Can target packages, classes, methods, or annotations.</li>
+<li>One Pointcut can be reused by multiple Advice methods.</li>
+</ul>
+`
+},
+
+{
+    id: 'aop',
+    q: 'What is @Around and ProceedingJoinPoint?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@Around</code> is the most powerful Advice in Spring AOP because it executes <strong>both before and after</strong> the target method.
+</p>
+
+<p>
+It receives a <code>ProceedingJoinPoint</code>, which represents the intercepted method and provides control over whether the original method should execute.
+</p>
+
+<h3>🤔 Why do we need @Around?</h3>
+
+<ul>
+<li>Measure execution time.</li>
+<li>Log method execution.</li>
+<li>Modify method arguments.</li>
+<li>Modify return values.</li>
+<li>Prevent method execution if required.</li>
+</ul>
+
+<h3>⚙️ Execution Flow</h3>
+
+<pre><code>
+Client
+   │
+   ▼
+@Around Advice
+   │
+Before Logic
+   │
+   ▼
+proceed()
+   │
+   ▼
+Business Method
+   │
+   ▼
+After Logic
+   │
+   ▼
+Return Result
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Aspect
+@Component
+public class LoggingAspect {
+
+    @Around(
+      "execution(* com.example.service.*.*(..))"
+    )
+    public Object logExecution(
+            ProceedingJoinPoint pjp)
+            throws Throwable {
+
+        System.out.println("Before Method");
+
+        Object result = pjp.proceed();
+
+        System.out.println("After Method");
+
+        return result;
+
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li><code>@Around</code> executes before and after the method.</li>
+<li>Must call <code>proceed()</code> to execute the original method.</li>
+<li>Can modify arguments and return values.</li>
+<li>Most commonly used for logging and performance monitoring.</li>
+</ul>
+`
+},
+
+{
+    id: 'aop',
+    q: 'Spring AOP vs AspectJ',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Both <strong>Spring AOP</strong> and <strong>AspectJ</strong> implement Aspect-Oriented Programming, but they work differently.
+</p>
+
+<p>
+Spring AOP is lightweight and proxy-based, while AspectJ is a complete AOP framework with many more capabilities.
+</p>
+
+<h3>🤔 When should we use them?</h3>
+
+<ul>
+<li>Use Spring AOP for most Spring Boot applications.</li>
+<li>Use AspectJ when advanced AOP features are required.</li>
+</ul>
+
+<h3>⚙️ Comparison</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Spring AOP</th>
+<th>AspectJ</th>
+</tr>
+
+<tr>
+<td>Proxy-based.</td>
+<td>Bytecode weaving.</td>
+</tr>
+
+<tr>
+<td>Runtime weaving.</td>
+<td>Compile-time or Load-time weaving.</td>
+</tr>
+
+<tr>
+<td>Only method execution Join Points.</td>
+<td>Supports methods, constructors, fields, and more.</td>
+</tr>
+
+<tr>
+<td>Works only on Spring Beans.</td>
+<td>Works on any Java class.</td>
+</tr>
+
+<tr>
+<td>Easy to configure.</td>
+<td>More powerful but more complex.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Spring AOP</strong></p>
+
+<pre><code>@Aspect
+@Component
+public class LoggingAspect {
+
+    @Before(
+      "execution(* com.example.service.*.*(..))"
+    )
+    public void log() {
+
+    }
+
+}
+</code></pre>
+
+<p><strong>Enable AspectJ Load-Time Weaving</strong></p>
+
+<pre><code>@Configuration
+@EnableLoadTimeWeaving
+public class AppConfig {
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Spring AOP is suitable for most applications.</li>
+<li>Spring AOP only intercepts method execution.</li>
+<li>AspectJ supports many more Join Point types.</li>
+<li>AspectJ is more powerful but requires additional configuration.</li>
+</ul>
+`
+},{
+    id: 'aop',
+    q: 'What is @EnableAspectJAutoProxy?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@EnableAspectJAutoProxy</code> is a Spring annotation that enables support for <strong>Aspect-Oriented Programming (AOP)</strong>. It tells Spring to scan for classes annotated with <code>@Aspect</code> and automatically create proxies for eligible Spring Beans.
+</p>
+
+<p>
+Without this annotation, Spring will not detect or execute your Aspects.
+</p>
+
+<h3>🤔 Why do we need @EnableAspectJAutoProxy?</h3>
+
+<ul>
+<li>Enable Spring AOP.</li>
+<li>Automatically detect <code>@Aspect</code> classes.</li>
+<li>Create proxies for Spring Beans.</li>
+<li>Apply Advice without modifying business code.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>Spring starts the application.</li>
+<li>It scans for classes annotated with <code>@Aspect</code>.</li>
+<li>Spring creates proxy objects for matching Beans.</li>
+<li>Method calls go through the proxy.</li>
+<li>The proxy executes the Advice before or after the target method.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Enable AOP</strong></p>
+
+<pre><code>@Configuration
+@EnableAspectJAutoProxy
+public class AopConfig {
+
+}
+</code></pre>
+
+<p><strong>Aspect</strong></p>
+
+<pre><code>@Aspect
+@Component
+public class LoggingAspect {
+
+    @Before("execution(* com.example.service.*.*(..))")
+    public void log() {
+
+        System.out.println("Method Started");
+
+    }
+
+}
+</code></pre>
+
+<p><strong>Force CGLIB Proxy</strong></p>
+
+<pre><code>@EnableAspectJAutoProxy(proxyTargetClass = true)
+</code></pre>
+
+<p>
+Setting <code>proxyTargetClass=true</code> forces Spring to use CGLIB proxies even if the Bean implements an interface.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Enables Spring AOP.</li>
+<li>Detects <code>@Aspect</code> classes.</li>
+<li>Automatically creates proxy objects.</li>
+<li>Spring Boot enables this automatically when using <code>spring-boot-starter-aop</code>.</li>
+</ul>
+`
+},
+
+{
+    id: 'aop',
+    q: 'What are Proxy Limitations in Spring AOP?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Spring AOP works by creating <strong>Proxy Objects</strong>. Since Advice executes through proxies, there are some limitations on where AOP can be applied.
+</p>
+
+<h3>🤔 Why do these limitations exist?</h3>
+
+<ul>
+<li>Spring AOP is proxy-based.</li>
+<li>Only method calls passing through the proxy are intercepted.</li>
+<li>Direct method calls inside the same class bypass the proxy.</li>
+</ul>
+
+<h3>⚙️ Common Limitations</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Limitation</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td>Method Execution Only</td>
+<td>Spring AOP intercepts only method execution, not field access or constructors.</td>
+</tr>
+
+<tr>
+<td>Self Invocation</td>
+<td>Calling one method from another using <code>this.method()</code> bypasses the proxy.</td>
+</tr>
+
+<tr>
+<td>Final Classes</td>
+<td>CGLIB cannot create proxies for <code>final</code> classes.</td>
+</tr>
+
+<tr>
+<td>Final Methods</td>
+<td>Final methods cannot be overridden, so Advice cannot be applied.</td>
+</tr>
+
+<tr>
+<td>Spring Beans Only</td>
+<td>AOP works only for objects managed by the Spring Container.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Self Invocation Problem</strong></p>
+
+<pre><code>@Service
+public class ProductService {
+
+    public void save() {
+
+        this.validate();
+
+    }
+
+    @LogExecution
+    public void validate() {
+
+    }
+
+}
+</code></pre>
+
+<p>
+The call to <code>validate()</code> bypasses the Spring Proxy, so the Aspect will not execute.
+</p>
+
+<p><strong>Correct Approach</strong></p>
+
+<pre><code>Client
+   │
+   ▼
+Spring Proxy
+   │
+   ▼
+ProductService.validate()
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Spring AOP is proxy-based.</li>
+<li>Only method execution Join Points are supported.</li>
+<li>Self-invocation bypasses the proxy.</li>
+<li>Final classes and final methods cannot be advised using CGLIB.</li>
+<li>Only Spring-managed Beans can use Spring AOP.</li>
+</ul>
+`
+},
+
+{
+    id: 'tx',
+    q: 'What is @Transactional?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@Transactional</code> is a Spring annotation used to manage database transactions automatically. It ensures that a group of database operations are executed as a <strong>single unit of work</strong>.
+</p>
+
+<p>
+If every operation succeeds, the transaction is <strong>committed</strong>. If any operation fails, the transaction is <strong>rolled back</strong>, leaving the database unchanged.
+</p>
+
+<h3>🤔 Why do we need Transactions?</h3>
+
+<ul>
+<li>Maintain data consistency.</li>
+<li>Prevent partial database updates.</li>
+<li>Automatically commit successful operations.</li>
+<li>Automatically rollback failed operations.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<pre><code>
+Client
+   │
+   ▼
+@Transactional Method
+   │
+   ▼
+Spring Proxy
+   │
+   ▼
+Begin Transaction
+   │
+   ▼
+Execute Database Operations
+   │
+   ├───────────────┐
+   │               │
+Success         Exception
+   │               │
+Commit        Rollback
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Service
+public class ProductService {
+
+    @Transactional
+    public void createProduct(Product product) {
+
+        productRepository.save(product);
+
+        stockRepository.save(
+                new Stock(product));
+
+    }
+
+}
+</code></pre>
+
+<p>
+If saving the stock fails, the product is also rolled back, ensuring both tables remain consistent.
+</p>
+
+<h3>⭐ Common Attributes</h3>
+
+<ul>
+<li><code>propagation</code></li>
+<li><code>isolation</code></li>
+<li><code>readOnly</code></li>
+<li><code>timeout</code></li>
+<li><code>rollbackFor</code></li>
+<li><code>noRollbackFor</code></li>
+</ul>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Groups multiple database operations into one transaction.</li>
+<li>Commits on success.</li>
+<li>Rolls back on failure.</li>
+<li>Implemented using Spring AOP proxies.</li>
+</ul>
+`
+},
+
+{
+    id: 'tx',
+    q: 'Transaction Propagation Types',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Transaction Propagation determines how a transactional method behaves when it is called from another transactional method.
+</p>
+
+<p>
+It tells Spring whether to join an existing transaction or create a new one.
+</p>
+
+<h3>⚙️ Propagation Types</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Propagation</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td><code>REQUIRED</code></td>
+<td>Joins the existing transaction or creates a new one if none exists. (Default)</td>
+</tr>
+
+<tr>
+<td><code>REQUIRES_NEW</code></td>
+<td>Always starts a new transaction and suspends the existing one.</td>
+</tr>
+
+<tr>
+<td><code>SUPPORTS</code></td>
+<td>Uses the current transaction if available; otherwise executes without one.</td>
+</tr>
+
+<tr>
+<td><code>MANDATORY</code></td>
+<td>Must execute inside an existing transaction, otherwise throws an exception.</td>
+</tr>
+
+<tr>
+<td><code>NOT_SUPPORTED</code></td>
+<td>Suspends the current transaction and executes without one.</td>
+</tr>
+
+<tr>
+<td><code>NEVER</code></td>
+<td>Fails if a transaction already exists.</td>
+</tr>
+
+<tr>
+<td><code>NESTED</code></td>
+<td>Creates a nested transaction using database savepoints.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Transactional(
+    propagation =
+    Propagation.REQUIRES_NEW
+)
+public void saveAuditLog() {
+
+    auditRepository.save(log);
+
+}
+</code></pre>
+
+<p>
+Even if the outer transaction rolls back, the audit log transaction can still commit successfully.
+</p>
+
+<h3>⭐ Most Common Types</h3>
+
+<ul>
+<li><code>REQUIRED</code> → Default and most commonly used.</li>
+<li><code>REQUIRES_NEW</code> → Independent transaction.</li>
+<li><code>SUPPORTS</code> → Optional transaction.</li>
+</ul>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Propagation controls transaction behavior between methods.</li>
+<li><code>REQUIRED</code> is the default propagation.</li>
+<li><code>REQUIRES_NEW</code> always creates a new transaction.</li>
+<li><code>NESTED</code> uses savepoints for partial rollback.</li>
+</ul>
+`
+},
+
+{
+    id: 'tx',
+    q: 'Transaction Isolation Levels',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Isolation Level determines how one transaction is isolated from other concurrent transactions. It controls data visibility and consistency when multiple users access the database simultaneously.
+</p>
+
+<h3>🤔 Why do we need Isolation?</h3>
+
+<ul>
+<li>Prevent data inconsistency.</li>
+<li>Handle concurrent database access.</li>
+<li>Avoid reading uncommitted changes.</li>
+<li>Balance consistency and performance.</li>
+</ul>
+
+<h3>⚙️ Isolation Levels</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Isolation Level</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td><code>READ_UNCOMMITTED</code></td>
+<td>Allows dirty reads. Lowest isolation.</td>
+</tr>
+
+<tr>
+<td><code>READ_COMMITTED</code></td>
+<td>Prevents dirty reads. Most databases use this by default.</td>
+</tr>
+
+<tr>
+<td><code>REPEATABLE_READ</code></td>
+<td>Prevents dirty reads and non-repeatable reads.</td>
+</tr>
+
+<tr>
+<td><code>SERIALIZABLE</code></td>
+<td>Highest isolation. Prevents dirty, non-repeatable, and phantom reads.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Transactional(
+    isolation =
+    Isolation.REPEATABLE_READ
+)
+public void updateProduct() {
+
+    // Database Operations
+
+}
+</code></pre>
+
+<h3>⭐ Isolation Problems</h3>
+
+<ul>
+<li><strong>Dirty Read</strong> → Reading uncommitted data.</li>
+<li><strong>Non-Repeatable Read</strong> → Reading different values for the same row.</li>
+<li><strong>Phantom Read</strong> → New rows appear during the same transaction.</li>
+</ul>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Higher isolation provides better consistency.</li>
+<li>Higher isolation also reduces performance due to increased locking.</li>
+<li><code>READ_COMMITTED</code> is the most commonly used isolation level.</li>
+</ul>
+`
+},
+{
+    id: 'tx',
+    q: 'When does @Transactional NOT roll back?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+By default, Spring rolls back a transaction only when a method throws an <strong>unchecked exception</strong> (<code>RuntimeException</code> or <code>Error</code>).
+</p>
+
+<p>
+If a checked exception (such as <code>IOException</code>) is thrown, Spring commits the transaction unless explicitly configured otherwise.
+</p>
+
+<h3>🤔 Why is this important?</h3>
+
+<ul>
+<li>Prevents unexpected commits.</li>
+<li>Helps control rollback behavior.</li>
+<li>Avoids inconsistent data.</li>
+</ul>
+
+<h3>⚙️ Default Rollback Rules</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Exception Type</th>
+<th>Rollback?</th>
+</tr>
+
+<tr>
+<td><code>RuntimeException</code></td>
+<td>✅ Yes</td>
+</tr>
+
+<tr>
+<td><code>Error</code></td>
+<td>✅ Yes</td>
+</tr>
+
+<tr>
+<td><code>Checked Exception</code></td>
+<td>❌ No (Default)</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Default Behavior</strong></p>
+
+<pre><code>@Transactional
+public void saveProduct()
+        throws IOException {
+
+    repository.save(product);
+
+    throw new IOException();
+
+}
+</code></pre>
+
+<p>
+The transaction will be <strong>committed</strong> because <code>IOException</code> is a checked exception.
+</p>
+
+<p><strong>Rollback for Checked Exception</strong></p>
+
+<pre><code>@Transactional(
+    rollbackFor = IOException.class
+)
+public void saveProduct()
+        throws IOException {
+
+    repository.save(product);
+
+    throw new IOException();
+
+}
+</code></pre>
+
+<p>
+Now the transaction is rolled back.
+</p>
+
+<h3>⚠️ Self Invocation Problem</h3>
+
+<pre><code>@Service
+public class ProductService {
+
+    public void methodA() {
+
+        this.methodB();
+
+    }
+
+    @Transactional
+    public void methodB() {
+
+    }
+
+}
+</code></pre>
+
+<p>
+Since <code>methodB()</code> is called using <code>this</code>, the Spring Proxy is bypassed and <code>@Transactional</code> will not work.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Rollback occurs only for RuntimeException and Error by default.</li>
+<li>Checked exceptions require <code>rollbackFor</code>.</li>
+<li>Self-invocation bypasses Spring's transaction proxy.</li>
+<li>Transactions work only on Spring-managed Beans.</li>
+</ul>
+`
+},
+
+{
+    id: 'tx',
+    q: 'What is the readOnly flag?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+The <code>readOnly</code> attribute of <code>@Transactional</code> tells Spring that the transaction is intended only for reading data and will not modify the database.
+</p>
+
+<p>
+It is an optimization hint for Hibernate and the database. It can improve performance by reducing unnecessary work such as dirty checking.
+</p>
+
+<h3>🤔 Why use readOnly?</h3>
+
+<ul>
+<li>Improve performance.</li>
+<li>Reduce Hibernate dirty checking.</li>
+<li>Optimize database read operations.</li>
+<li>Clearly indicate read-only methods.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ul>
+<li>Spring starts a read-only transaction.</li>
+<li>Hibernate skips unnecessary change tracking.</li>
+<li>Database can optimize read operations.</li>
+<li>Method returns data without modifying it.</li>
+</ul>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Service
+public class ProductService {
+
+    @Transactional(readOnly = true)
+    public List&lt;Product&gt; getProducts() {
+
+        return repository.findAll();
+
+    }
+
+}
+</code></pre>
+
+<p>
+This method only retrieves data, so marking it as read-only improves efficiency.
+</p>
+
+<h3>⚠️ Important Note</h3>
+
+<p>
+<code>readOnly=true</code> does <strong>not</strong> prevent writes. It is only a performance optimization. If you explicitly save an entity, the database may still be updated depending on the JPA provider.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Used for read operations.</li>
+<li>Improves Hibernate performance.</li>
+<li>Reduces dirty checking.</li>
+<li>Does not strictly prevent database writes.</li>
+</ul>
+`
+},
+
+{
+    id: 'tx',
+    q: 'Optimistic vs Pessimistic Locking',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Locking is used to prevent data inconsistency when multiple users try to update the same record simultaneously.
+</p>
+
+<p>
+Spring Data JPA supports two locking strategies:
+</p>
+
+<ul>
+<li><strong>Optimistic Locking</strong></li>
+<li><strong>Pessimistic Locking</strong></li>
+</ul>
+
+<h3>⚙️ Comparison</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Optimistic Locking</th>
+<th>Pessimistic Locking</th>
+</tr>
+
+<tr>
+<td>Assumes conflicts are rare.</td>
+<td>Assumes conflicts are common.</td>
+</tr>
+
+<tr>
+<td>No database lock while reading.</td>
+<td>Locks the row immediately.</td>
+</tr>
+
+<tr>
+<td>Uses <code>@Version</code>.</td>
+<td>Uses <code>@Lock</code>.</td>
+</tr>
+
+<tr>
+<td>Better performance.</td>
+<td>Lower performance due to locking.</td>
+</tr>
+
+<tr>
+<td>Throws <code>OptimisticLockException</code> on conflict.</td>
+<td>Other transactions wait until the lock is released.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Optimistic Locking</strong></p>
+
+<pre><code>@Entity
+public class Product {
+
+    @Id
+    private Long id;
+
+    @Version
+    private Integer version;
+
+}
+</code></pre>
+
+<p>
+If two users update the same Product simultaneously, Hibernate detects the version mismatch and throws an exception.
+</p>
+
+<p><strong>Pessimistic Locking</strong></p>
+
+<pre><code>@Lock(LockModeType.PESSIMISTIC_WRITE)
+@Query("""
+SELECT p
+FROM Product p
+WHERE p.id = :id
+""")
+Product findProduct(Long id);
+</code></pre>
+
+<p>
+The selected row is locked until the transaction completes, preventing other transactions from modifying it.
+</p>
+
+<h3>⭐ When to use?</h3>
+
+<ul>
+<li><strong>Optimistic</strong> → Web applications with low update conflicts.</li>
+<li><strong>Pessimistic</strong> → Banking, inventory, and high-contention systems.</li>
+</ul>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Optimistic Locking uses <code>@Version</code>.</li>
+<li>Pessimistic Locking uses database locks.</li>
+<li>Optimistic locking provides better performance.</li>
+<li>Pessimistic locking provides stronger consistency.</li>
+</ul>
+`
+},
+
+{
+    id: 'cloud',
+    q: 'What is Spring Cloud?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<strong>Spring Cloud</strong> is a collection of tools built on top of Spring Boot that helps developers build and manage <strong>Microservices</strong>. It provides solutions for common distributed system problems such as service discovery, centralized configuration, API Gateway, load balancing, fault tolerance, and distributed tracing.
+</p>
+
+<p>
+Instead of building these features from scratch, Spring Cloud provides ready-to-use components that integrate seamlessly with Spring Boot.
+</p>
+
+<h3>🤔 Why do we need Spring Cloud?</h3>
+
+<ul>
+<li>Manage communication between microservices.</li>
+<li>Centralize application configuration.</li>
+<li>Discover services dynamically.</li>
+<li>Handle failures gracefully.</li>
+<li>Monitor and trace requests across services.</li>
+</ul>
+
+<h3>⚙️ Spring Cloud Components</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+</tr>
+
+<tr>
+<td>Config Server</td>
+<td>Centralized configuration management.</td>
+</tr>
+
+<tr>
+<td>Eureka</td>
+<td>Service Discovery.</td>
+</tr>
+
+<tr>
+<td>Gateway</td>
+<td>API Gateway.</td>
+</tr>
+
+<tr>
+<td>OpenFeign</td>
+<td>Service-to-Service Communication.</td>
+</tr>
+
+<tr>
+<td>Resilience4j</td>
+<td>Circuit Breaker and Fault Tolerance.</td>
+</tr>
+
+<tr>
+<td>Micrometer + Zipkin</td>
+<td>Distributed Tracing.</td>
+</tr>
+
+</table>
+
+<h3>⚙️ Typical Architecture</h3>
+
+<pre><code>
+                Client
+                   │
+                   ▼
+        Spring Cloud Gateway
+                   │
+        ┌──────────┼──────────┐
+        ▼          ▼          ▼
+ Product Service  User Service Order Service
+        │          │          │
+        └──────────┼──────────┘
+                   ▼
+                Eureka
+                   │
+                   ▼
+             Config Server
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Built specifically for Microservices.</li>
+<li>Works together with Spring Boot.</li>
+<li>Provides service discovery, gateway, config server, fault tolerance, and tracing.</li>
+<li>Reduces the complexity of distributed systems.</li>
+</ul>
+`
+},
+
+{
+    id: 'cloud',
+    q: 'What is Spring Cloud Config?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<strong>Spring Cloud Config</strong> provides centralized configuration management for multiple microservices. Instead of each service maintaining its own configuration files, all configurations are stored in one central location.
+</p>
+
+<p>
+The Config Server usually stores configuration files in a Git repository and serves them to client applications at startup.
+</p>
+
+<h3>🤔 Why do we need Config Server?</h3>
+
+<ul>
+<li>Centralize configuration.</li>
+<li>Avoid duplicate configuration files.</li>
+<li>Easily update configurations.</li>
+<li>Maintain separate configurations for Dev, Test, and Production.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<pre><code>
+          Git Repository
+                 │
+                 ▼
+      Spring Cloud Config Server
+                 │
+      ┌──────────┼──────────┐
+      ▼          ▼          ▼
+ Product      User      Order
+ Service     Service    Service
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Config Server</strong></p>
+
+<pre><code>@SpringBootApplication
+@EnableConfigServer
+public class ConfigServerApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(
+            ConfigServerApplication.class,
+            args
+        );
+    }
+
+}
+</code></pre>
+
+<p><strong>Client Configuration</strong></p>
+
+<pre><code>spring.application.name=product-service
+
+spring.config.import=
+configserver:http://localhost:8888
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Stores configuration in one place.</li>
+<li>Usually uses Git as the backend.</li>
+<li>Supports environment-specific configurations.</li>
+<li>Clients automatically fetch configurations during startup.</li>
+</ul>
+`
+},
+
+{
+    id: 'cloud',
+    q: 'What is Eureka?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<strong>Eureka</strong> is a Service Discovery Server developed by Netflix. It allows microservices to register themselves so that other services can discover them without hardcoding URLs.
+</p>
+
+<p>
+Instead of calling services using IP addresses, applications simply use the service name.
+</p>
+
+<h3>🤔 Why do we need Eureka?</h3>
+
+<ul>
+<li>Dynamic service discovery.</li>
+<li>No hardcoded URLs.</li>
+<li>Supports scaling.</li>
+<li>Automatically removes unavailable services.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<pre><code>
+          Eureka Server
+          /     |      \
+         /      |       \
+ Product   User   Order Services
+     \       |        /
+      \______|_______/
+             │
+        Service Discovery
+</code></pre>
+
+<ol>
+<li>Each service registers itself with Eureka.</li>
+<li>Services periodically send heartbeats.</li>
+<li>When one service wants to call another, it asks Eureka for the available instances.</li>
+<li>Eureka returns the service location.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Eureka Server</strong></p>
+
+<pre><code>@SpringBootApplication
+@EnableEurekaServer
+public class EurekaServerApplication {
+
+}
+</code></pre>
+
+<p><strong>Client</strong></p>
+
+<pre><code>@SpringBootApplication
+@EnableDiscoveryClient
+public class ProductServiceApplication {
+
+}
+</code></pre>
+
+<p><strong>application.properties</strong></p>
+
+<pre><code>spring.application.name=product-service
+
+eureka.client.service-url.defaultZone=
+http://localhost:8761/eureka
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Acts as a Service Registry.</li>
+<li>Services register themselves automatically.</li>
+<li>Clients discover services using their names.</li>
+<li>Supports dynamic scaling and failover.</li>
+</ul>
+`
+},
+{
+    id: 'cloud',
+    q: 'What is a Circuit Breaker?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+A <strong>Circuit Breaker</strong> is a fault tolerance pattern that prevents repeated calls to a failing service. Instead of continuously sending requests to an unavailable service, it temporarily stops the calls and returns a fallback response.
+</p>
+
+<p>
+Spring Cloud commonly uses <strong>Resilience4j</strong> to implement Circuit Breakers.
+</p>
+
+<h3>🤔 Why do we need a Circuit Breaker?</h3>
+
+<ul>
+<li>Prevent cascading failures.</li>
+<li>Reduce unnecessary waiting time.</li>
+<li>Improve system stability.</li>
+<li>Provide fallback responses.</li>
+</ul>
+
+<h3>⚙️ Circuit Breaker States</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>State</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td><strong>CLOSED</strong></td>
+<td>Requests are allowed. Normal operation.</td>
+</tr>
+
+<tr>
+<td><strong>OPEN</strong></td>
+<td>Requests are blocked and fallback is returned.</td>
+</tr>
+
+<tr>
+<td><strong>HALF_OPEN</strong></td>
+<td>A few requests are allowed to check if the service has recovered.</td>
+</tr>
+
+</table>
+
+<h3>⚙️ Working Flow</h3>
+
+<pre><code>
+Client
+   │
+   ▼
+Circuit Breaker
+   │
+   ├───────────────► Service Available
+   │                    │
+   │                    ▼
+   │               Return Response
+   │
+   └───────────────► Service Failing
+                        │
+                        ▼
+                 OPEN Circuit
+                        │
+                        ▼
+                Fallback Response
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@CircuitBreaker(
+    name = "user-service",
+    fallbackMethod = "fallback"
+)
+public User getUser(Long id) {
+
+    return feignClient.getUser(id);
+
+}
+
+public User fallback(
+        Long id,
+        Exception ex) {
+
+    return new User(id, "Service Unavailable");
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Prevents repeated calls to failed services.</li>
+<li>Uses fallback methods.</li>
+<li>Improves system resilience.</li>
+<li>Commonly implemented using Resilience4j.</li>
+</ul>
+`
+},
+
+{
+    id: 'cloud',
+    q: 'What is Spring Cloud Gateway?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<strong>Spring Cloud Gateway</strong> is an API Gateway built on Spring WebFlux. It acts as a single entry point for all client requests and routes them to the appropriate microservice.
+</p>
+
+<p>
+Instead of clients communicating directly with every service, they communicate only with the Gateway.
+</p>
+
+<h3>🤔 Why do we need an API Gateway?</h3>
+
+<ul>
+<li>Single entry point for clients.</li>
+<li>Hide internal microservice URLs.</li>
+<li>Centralize authentication and authorization.</li>
+<li>Perform routing, rate limiting, logging, and filtering.</li>
+</ul>
+
+<h3>⚙️ Architecture</h3>
+
+<pre><code>
+             Client
+                │
+                ▼
+      Spring Cloud Gateway
+      ┌─────────┼─────────┐
+      ▼         ▼         ▼
+ Product     User      Order
+ Service     Service   Service
+</code></pre>
+
+<h3>⭐ Common Gateway Features</h3>
+
+<ul>
+<li>Routing</li>
+<li>Authentication</li>
+<li>Authorization</li>
+<li>Rate Limiting</li>
+<li>Circuit Breaker</li>
+<li>Logging</li>
+<li>Request & Response Modification</li>
+</ul>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>spring:
+  cloud:
+    gateway:
+      routes:
+      - id: product-service
+        uri: lb://PRODUCT-SERVICE
+        predicates:
+        - Path=/products/**
+</code></pre>
+
+<p>
+Here, all requests matching <code>/products/**</code> are routed to the <code>PRODUCT-SERVICE</code> registered in Eureka.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Acts as the entry point for all APIs.</li>
+<li>Routes requests to microservices.</li>
+<li>Integrates with Eureka and Resilience4j.</li>
+<li>Replaces Netflix Zuul.</li>
+</ul>
+`
+},
+
+{
+    id: 'cloud',
+    q: 'What is OpenFeign?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<strong>OpenFeign</strong> is a declarative HTTP client that simplifies communication between microservices. Instead of writing HTTP client code manually, you only define an interface, and Spring automatically generates its implementation.
+</p>
+
+<p>
+OpenFeign integrates with Eureka, allowing services to communicate using service names instead of URLs.
+</p>
+
+<h3>🤔 Why do we need OpenFeign?</h3>
+
+<ul>
+<li>Reduce REST client boilerplate code.</li>
+<li>Call services using simple Java interfaces.</li>
+<li>Integrate with Eureka for service discovery.</li>
+<li>Improve code readability.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<pre><code>
+Product Service
+      │
+      ▼
+OpenFeign Client
+      │
+      ▼
+Eureka
+      │
+      ▼
+User Service
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Feign Client</strong></p>
+
+<pre><code>@FeignClient(name = "USER-SERVICE")
+public interface UserClient {
+
+    @GetMapping("/users/{id}")
+    User getUser(
+            @PathVariable Long id);
+
+}
+</code></pre>
+
+<p><strong>Using Feign</strong></p>
+
+<pre><code>@Service
+public class ProductService {
+
+    private final UserClient userClient;
+
+    public ProductService(
+            UserClient userClient) {
+        this.userClient = userClient;
+    }
+
+    public User getUser(Long id) {
+
+        return userClient.getUser(id);
+
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Declarative REST client.</li>
+<li>No manual HTTP request code.</li>
+<li>Works seamlessly with Eureka.</li>
+<li>Much simpler than RestTemplate for microservice communication.</li>
+</ul>
+`
+
+},
+{
+    id: 'cloud',
+    q: 'What is Distributed Tracing?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+In a Microservices architecture, a single client request often travels through multiple services. <strong>Distributed Tracing</strong> tracks that request across all services, making it easy to understand the complete request flow.
+</p>
+
+<p>
+Each request is assigned a unique <strong>Trace ID</strong>, and every operation within that request gets its own <strong>Span ID</strong>.
+</p>
+
+<h3>🤔 Why do we need Distributed Tracing?</h3>
+
+<ul>
+<li>Track requests across multiple microservices.</li>
+<li>Debug failures quickly.</li>
+<li>Measure service response times.</li>
+<li>Identify performance bottlenecks.</li>
+<li>Correlate logs from different services.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<pre><code>
+Client Request
+      │
+ TraceId = ABC123
+      │
+      ▼
+Gateway
+ (Span 1)
+      │
+      ▼
+Product Service
+ (Span 2)
+      │
+      ▼
+User Service
+ (Span 3)
+      │
+      ▼
+Order Service
+ (Span 4)
+</code></pre>
+
+<p>
+All services share the same <strong>Trace ID</strong>, while each service generates its own <strong>Span ID</strong>.
+</p>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>application.properties</strong></p>
+
+<pre><code>management.tracing.sampling.probability=1.0
+
+management.zipkin.tracing.endpoint=
+http://localhost:9411/api/v2/spans
+</code></pre>
+
+<p>
+Spring Boot 3 uses <strong>Micrometer Tracing</strong>, which automatically creates Trace IDs and Span IDs and exports them to tools such as Zipkin or Jaeger.
+</p>
+
+<h3>⭐ Popular Tracing Tools</h3>
+
+<ul>
+<li>Micrometer Tracing</li>
+<li>Zipkin</li>
+<li>Jaeger</li>
+<li>OpenTelemetry</li>
+</ul>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Trace ID identifies the complete request.</li>
+<li>Span ID identifies a single operation.</li>
+<li>Helps debug distributed systems.</li>
+<li>Integrates with Zipkin and Jaeger.</li>
+</ul>
+`
+},
+
+{
+    id: 'cloud',
+    q: 'RestTemplate vs WebClient',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Both <code>RestTemplate</code> and <code>WebClient</code> are HTTP clients used to communicate with REST APIs.
+</p>
+
+<p>
+<code>RestTemplate</code> is the older synchronous client, while <code>WebClient</code> is the modern non-blocking client introduced with Spring WebFlux.
+</p>
+
+<h3>🤔 Why do we need WebClient?</h3>
+
+<ul>
+<li>Better scalability.</li>
+<li>Supports asynchronous programming.</li>
+<li>Handles streaming data.</li>
+<li>Works efficiently with reactive applications.</li>
+</ul>
+
+<h3>⚙️ Comparison</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>RestTemplate</th>
+<th>WebClient</th>
+</tr>
+
+<tr>
+<td>Synchronous (Blocking)</td>
+<td>Asynchronous (Non-Blocking)</td>
+</tr>
+
+<tr>
+<td>Part of Spring MVC</td>
+<td>Part of Spring WebFlux</td>
+</tr>
+
+<tr>
+<td>Deprecated for new development</td>
+<td>Recommended for new applications</td>
+</tr>
+
+<tr>
+<td>One request per thread</td>
+<td>Uses fewer threads efficiently</td>
+</tr>
+
+<tr>
+<td>Limited streaming support</td>
+<td>Supports streaming and reactive programming</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>RestTemplate</strong></p>
+
+<pre><code>RestTemplate restTemplate =
+        new RestTemplate();
+
+User user =
+        restTemplate.getForObject(
+            "http://USER-SERVICE/users/1",
+            User.class
+        );
+</code></pre>
+
+<p><strong>WebClient</strong></p>
+
+<pre><code>WebClient webClient =
+        WebClient.create();
+
+User user =
+        webClient.get()
+            .uri("http://USER-SERVICE/users/1")
+            .retrieve()
+            .bodyToMono(User.class)
+            .block();
+</code></pre>
+
+<h3>⭐ When to use?</h3>
+
+<ul>
+<li><strong>RestTemplate</strong> → Existing legacy applications.</li>
+<li><strong>WebClient</strong> → New Spring Boot applications and reactive systems.</li>
+</ul>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>RestTemplate is synchronous and blocking.</li>
+<li>WebClient is asynchronous and non-blocking.</li>
+<li>WebClient is the recommended HTTP client for new projects.</li>
+<li>Supports both reactive and traditional Spring Boot applications.</li>
+</ul>
+`
+},
+{
+    id: 'test',
+    q: 'What is @SpringBootTest?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@SpringBootTest</code> is used for <strong>integration testing</strong>. It loads the complete Spring Boot Application Context, allowing you to test multiple components working together just like they do in a real application.
+</p>
+
+<p>
+Unlike unit tests, it starts almost the entire application, including Beans, configuration, repositories, services, controllers, and security (depending on the configuration).
+</p>
+
+<h3>🤔 Why do we need @SpringBootTest?</h3>
+
+<ul>
+<li>Test the complete application.</li>
+<li>Verify interaction between multiple layers.</li>
+<li>Test real Spring Beans.</li>
+<li>Useful for end-to-end integration testing.</li>
+</ul>
+
+<h3>⚙️ Web Environment Options</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td><code>MOCK</code></td>
+<td>Starts a mock servlet environment (Default).</td>
+</tr>
+
+<tr>
+<td><code>RANDOM_PORT</code></td>
+<td>Starts an embedded server on a random port.</td>
+</tr>
+
+<tr>
+<td><code>DEFINED_PORT</code></td>
+<td>Starts the server using the configured port.</td>
+</tr>
+
+<tr>
+<td><code>NONE</code></td>
+<td>Loads only the ApplicationContext without a web environment.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@SpringBootTest
+class ProductServiceTest {
+
+    @Autowired
+    private ProductService service;
+
+    @Test
+    void shouldReturnProducts() {
+
+        assertFalse(
+            service.getProducts().isEmpty()
+        );
+
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Loads the complete Spring Boot context.</li>
+<li>Used for integration testing.</li>
+<li>Slower than slice tests.</li>
+<li>Tests multiple layers together.</li>
+</ul>
+`
+},
+
+{
+    id: 'test',
+    q: 'What are Spring Test Slices?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Spring Test Slices load only a specific part of the Spring Application Context instead of the entire application. This makes tests much faster than <code>@SpringBootTest</code>.
+</p>
+
+<h3>🤔 Why do we need Slice Tests?</h3>
+
+<ul>
+<li>Faster test execution.</li>
+<li>Load only required components.</li>
+<li>Reduce memory usage.</li>
+<li>Focus on one application layer.</li>
+</ul>
+
+<h3>⚙️ Common Slice Annotations</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Annotation</th>
+<th>Purpose</th>
+</tr>
+
+<tr>
+<td><code>@WebMvcTest</code></td>
+<td>Tests Controllers only.</td>
+</tr>
+
+<tr>
+<td><code>@DataJpaTest</code></td>
+<td>Tests JPA Repositories.</td>
+</tr>
+
+<tr>
+<td><code>@JsonTest</code></td>
+<td>Tests JSON serialization and deserialization.</td>
+</tr>
+
+<tr>
+<td><code>@WebFluxTest</code></td>
+<td>Tests WebFlux Controllers.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@WebMvcTest(ProductController.class)
+class ProductControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Loads only one application layer.</li>
+<li>Much faster than <code>@SpringBootTest</code>.</li>
+<li>Ideal for focused testing.</li>
+<li>Improves test performance.</li>
+</ul>
+`
+},
+
+{
+    id: 'test',
+    q: 'What is MockMvc?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>MockMvc</code> is a testing framework used to test Spring MVC Controllers without starting an actual HTTP server.
+</p>
+
+<p>
+It simulates HTTP requests and passes them through the <code>DispatcherServlet</code>, allowing you to verify request handling, response status, headers, and JSON content.
+</p>
+
+<h3>🤔 Why do we need MockMvc?</h3>
+
+<ul>
+<li>Test REST Controllers.</li>
+<li>No need to start Tomcat.</li>
+<li>Fast controller testing.</li>
+<li>Verify request and response behavior.</li>
+</ul>
+
+<h3>⚙️ Request Flow</h3>
+
+<pre><code>
+MockMvc
+    │
+HTTP Request
+    │
+    ▼
+DispatcherServlet
+    │
+    ▼
+Controller
+    │
+    ▼
+Mock Response
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Autowired
+private MockMvc mockMvc;
+
+@Test
+void shouldReturnProducts()
+        throws Exception {
+
+    mockMvc.perform(
+            get("/products"))
+        .andExpect(status().isOk())
+        .andExpect(
+            jsonPath("$[0].name")
+            .exists()
+        );
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Tests Controllers without starting a server.</li>
+<li>Uses DispatcherServlet internally.</li>
+<li>Supports request and response assertions.</li>
+<li>Works well with <code>@WebMvcTest</code>.</li>
+</ul>
+`
+},
+{
+    id: 'test',
+    q: 'What is @MockBean?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@MockBean</code> is a Spring Boot testing annotation that creates a <strong>Mockito mock</strong> and adds it to the Spring Application Context.
+</p>
+
+<p>
+If a bean of the same type already exists, Spring replaces it with the mock. This allows you to test a component without using the real implementation of its dependencies.
+</p>
+
+<h3>🤔 Why do we need @MockBean?</h3>
+
+<ul>
+<li>Isolate the class being tested.</li>
+<li>Avoid calling real databases or external services.</li>
+<li>Control dependency behavior.</li>
+<li>Write predictable integration tests.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<pre><code>
+Controller
+     │
+     ▼
+Service (MockBean)
+     │
+Mockito Response
+</code></pre>
+
+<p>
+Instead of calling the real service, Spring injects the mocked service into the Controller.
+</p>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@WebMvcTest(ProductController.class)
+class ProductControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private ProductService service;
+
+    @Test
+    void shouldReturnProducts()
+            throws Exception {
+
+        when(service.getProducts())
+                .thenReturn(List.of(new Product()));
+
+        mockMvc.perform(get("/products"))
+                .andExpect(status().isOk());
+
+    }
+
+}
+</code></pre>
+
+<h3>⭐ @MockBean vs @SpyBean</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>@MockBean</th>
+<th>@SpyBean</th>
+</tr>
+
+<tr>
+<td>Creates a complete mock.</td>
+<td>Wraps the real bean.</td>
+</tr>
+
+<tr>
+<td>No real methods execute unless stubbed.</td>
+<td>Real methods execute unless mocked.</td>
+</tr>
+
+<tr>
+<td>Used when dependency should be fully mocked.</td>
+<td>Used when only a few methods need mocking.</td>
+</tr>
+
+</table>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Creates a Mockito mock inside the Spring Context.</li>
+<li>Replaces existing Beans.</li>
+<li>Commonly used with <code>@WebMvcTest</code>.</li>
+<li>Useful for isolating Controllers and Services.</li>
+</ul>
+`
+},
+
+{
+    id: 'test',
+    q: 'TestRestTemplate vs WebTestClient',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Both <code>TestRestTemplate</code> and <code>WebTestClient</code> are used for testing REST APIs, but they serve different purposes.
+</p>
+
+<p>
+<code>TestRestTemplate</code> is a synchronous HTTP client mainly used with traditional Spring MVC applications, while <code>WebTestClient</code> is a modern testing client that supports both Spring MVC and Spring WebFlux.
+</p>
+
+<h3>⚙️ Comparison</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>TestRestTemplate</th>
+<th>WebTestClient</th>
+</tr>
+
+<tr>
+<td>Synchronous (Blocking)</td>
+<td>Non-Blocking</td>
+</tr>
+
+<tr>
+<td>Simple REST calls</td>
+<td>Fluent API with powerful assertions</td>
+</tr>
+
+<tr>
+<td>Mainly used with <code>@SpringBootTest(RANDOM_PORT)</code></td>
+<td>Works with MVC and WebFlux</td>
+</tr>
+
+<tr>
+<td>Older approach</td>
+<td>Recommended for Spring Boot 3+</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>TestRestTemplate</strong></p>
+
+<pre><code>@Autowired
+private TestRestTemplate restTemplate;
+
+@Test
+void shouldGetProducts() {
+
+    ResponseEntity&lt;String&gt; response =
+        restTemplate.getForEntity(
+            "/products",
+            String.class
+        );
+
+}
+</code></pre>
+
+<p><strong>WebTestClient</strong></p>
+
+<pre><code>webTestClient
+    .get()
+    .uri("/products")
+    .exchange()
+    .expectStatus().isOk()
+    .expectBody();
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Both test REST APIs.</li>
+<li>WebTestClient provides richer assertions.</li>
+<li>WebTestClient is recommended for new applications.</li>
+<li>TestRestTemplate is commonly used with RANDOM_PORT integration tests.</li>
+</ul>
+`
+},
+
+{
+    id: 'test',
+    q: 'What is @Sql?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@Sql</code> is a Spring Test annotation used to execute SQL scripts before or after a test method. It is commonly used to prepare test data or clean up the database.
+</p>
+
+<h3>🤔 Why do we need @Sql?</h3>
+
+<ul>
+<li>Insert test data.</li>
+<li>Delete test data after execution.</li>
+<li>Create consistent test environments.</li>
+<li>Avoid writing setup code in Java.</li>
+</ul>
+
+<h3>⚙️ Execution Phases</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Phase</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td><code>BEFORE_TEST_METHOD</code></td>
+<td>Runs SQL before the test.</td>
+</tr>
+
+<tr>
+<td><code>AFTER_TEST_METHOD</code></td>
+<td>Runs SQL after the test.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@DataJpaTest
+
+@Sql("/insert-test-data.sql")
+class ProductRepositoryTest {
+
+    @Autowired
+    private ProductRepository repository;
+
+}
+</code></pre>
+
+<p><strong>Cleanup Script</strong></p>
+
+<pre><code>@Sql(
+    scripts = "/cleanup.sql",
+    executionPhase =
+    Sql.ExecutionPhase.AFTER_TEST_METHOD
+)
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Executes SQL scripts during testing.</li>
+<li>Useful for preparing and cleaning test data.</li>
+<li>Works well with <code>@DataJpaTest</code>.</li>
+<li>Supports execution before and after tests.</li>
+</ul>
+`
+},
+{
+    id: 'test',
+    q: 'How to test @Async methods?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Methods annotated with <code>@Async</code> execute in a separate thread. Since they run asynchronously, the calling thread does not wait for them to complete.
+</p>
+
+<p>
+Testing asynchronous methods requires waiting for the background task to finish before verifying the result.
+</p>
+
+<h3>🤔 Why is testing @Async different?</h3>
+
+<ul>
+<li>Method executes in another thread.</li>
+<li>Execution may not finish immediately.</li>
+<li>Tests can fail if assertions run too early.</li>
+</ul>
+
+<h3>⚙️ Common Testing Approaches</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Approach</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td><code>Future.get()</code></td>
+<td>Waits until the task completes.</td>
+</tr>
+
+<tr>
+<td><code>CompletableFuture.join()</code></td>
+<td>Blocks until completion.</td>
+</tr>
+
+<tr>
+<td><code>@SpyBean</code></td>
+<td>Verify that an async method was called.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Async Service</strong></p>
+
+<pre><code>@Async
+public CompletableFuture&lt;String&gt; process() {
+
+    return CompletableFuture.completedFuture("Done");
+
+}
+</code></pre>
+
+<p><strong>Test</strong></p>
+
+<pre><code>@Test
+void shouldExecuteAsync()
+        throws Exception {
+
+    CompletableFuture&lt;String&gt; future =
+            service.process();
+
+    assertEquals(
+            "Done",
+            future.get()
+    );
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li><code>@Async</code> methods run in another thread.</li>
+<li>Wait for completion using <code>get()</code> or <code>join()</code>.</li>
+<li>Use <code>@SpyBean</code> when verifying async method calls.</li>
+<li>Test the business logic separately from the async wrapper when possible.</li>
+</ul>
+`
+},
+
+{
+    id: 'test',
+    q: 'What is @DataJpaTest?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@DataJpaTest</code> is a Spring Boot <strong>slice test</strong> used for testing JPA repositories. It loads only JPA-related components instead of the complete Spring Application Context.
+</p>
+
+<p>
+By default, it configures an in-memory H2 database and wraps each test inside a transaction that is automatically rolled back after execution.
+</p>
+
+<h3>🤔 Why do we need @DataJpaTest?</h3>
+
+<ul>
+<li>Test Repository methods.</li>
+<li>Validate JPA queries.</li>
+<li>Fast repository testing.</li>
+<li>Automatically rollback test data.</li>
+</ul>
+
+<h3>⚙️ What does it load?</h3>
+
+<ul>
+<li>JPA Repositories</li>
+<li>Entity Classes</li>
+<li>Hibernate</li>
+<li>Embedded Database (H2 by default)</li>
+</ul>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@DataJpaTest
+class ProductRepositoryTest {
+
+    @Autowired
+    private ProductRepository repository;
+
+    @Test
+    void shouldSaveProduct() {
+
+        Product product = new Product();
+        product.setName("Laptop");
+
+        Product saved =
+                repository.save(product);
+
+        assertNotNull(saved.getId());
+
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Repository testing only.</li>
+<li>Uses an embedded database by default.</li>
+<li>Each test runs inside a transaction.</li>
+<li>Data is automatically rolled back after every test.</li>
+</ul>
+`
+},
+
+{
+    id: 'test',
+    q: 'What is Testcontainers?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<strong>Testcontainers</strong> is a Java library that starts temporary Docker containers during integration testing. Instead of using an in-memory database like H2, you can test against the same database used in production (such as PostgreSQL or MySQL).
+</p>
+
+<p>
+Each test gets a clean, isolated database that is automatically created and removed.
+</p>
+
+<h3>🤔 Why do we need Testcontainers?</h3>
+
+<ul>
+<li>Test with real databases.</li>
+<li>Avoid differences between H2 and production databases.</li>
+<li>Create isolated test environments.</li>
+<li>Improve integration test reliability.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<pre><code>
+JUnit Test
+     │
+     ▼
+Testcontainers
+     │
+     ▼
+Docker
+     │
+     ▼
+PostgreSQL Container
+     │
+     ▼
+Spring Boot Application
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Testcontainers
+@SpringBootTest
+class ProductRepositoryTest {
+
+    @Container
+    @ServiceConnection
+    static PostgreSQLContainer&lt;?&gt; postgres =
+            new PostgreSQLContainer<>("postgres:16");
+
+}
+</code></pre>
+
+<p>
+With Spring Boot 3.1+, <code>@ServiceConnection</code> automatically configures the application's datasource from the container.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Starts temporary Docker containers for tests.</li>
+<li>Supports PostgreSQL, MySQL, MongoDB, Redis, Kafka, and many others.</li>
+<li>Provides production-like integration testing.</li>
+<li>Containers are automatically created and destroyed.</li>
+</ul>
+`
+},
+{
+    id: 'test',
+    q: 'Unit Tests vs Integration Tests',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Both Unit Tests and Integration Tests are important for verifying application behavior, but they focus on different levels of testing.
+</p>
+
+<ul>
+<li><strong>Unit Test</strong> tests a single class or method in isolation.</li>
+<li><strong>Integration Test</strong> verifies that multiple components work together correctly.</li>
+</ul>
+
+<h3>🤔 Why do we need both?</h3>
+
+<ul>
+<li>Unit Tests quickly verify business logic.</li>
+<li>Integration Tests ensure components work correctly together.</li>
+<li>Together they improve application quality.</li>
+</ul>
+
+<h3>⚙️ Comparison</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Unit Test</th>
+<th>Integration Test</th>
+</tr>
+
+<tr>
+<td>Tests a single class.</td>
+<td>Tests multiple components together.</td>
+</tr>
+
+<tr>
+<td>Uses Mockito or other mocks.</td>
+<td>Uses real Spring Beans.</td>
+</tr>
+
+<tr>
+<td>No Spring Context.</td>
+<td>Loads Spring Context.</td>
+</tr>
+
+<tr>
+<td>Very fast.</td>
+<td>Slower than Unit Tests.</td>
+</tr>
+
+<tr>
+<td>Tests business logic only.</td>
+<td>Tests complete application flow.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Unit Test</strong></p>
+
+<pre><code>@ExtendWith(MockitoExtension.class)
+class ProductServiceTest {
+
+    @Mock
+    ProductRepository repository;
+
+    @InjectMocks
+    ProductService service;
+
+}
+</code></pre>
+
+<p><strong>Integration Test</strong></p>
+
+<pre><code>@SpringBootTest
+class ProductServiceIT {
+
+    @Autowired
+    ProductService service;
+
+}
+</code></pre>
+
+<h3>⭐ Test Pyramid</h3>
+
+<pre><code>
+          End-to-End Tests
+               ▲
+      Integration Tests
+               ▲
+         Unit Tests
+</code></pre>
+
+<p>
+The recommended approach is to have many Unit Tests, fewer Integration Tests, and only a small number of End-to-End Tests.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Unit Tests are fast and isolated.</li>
+<li>Integration Tests verify multiple components together.</li>
+<li>Unit Tests use mocks.</li>
+<li>Integration Tests use the Spring Application Context.</li>
+</ul>
+`
+},
+
+{
+    id: 'test',
+    q: 'What is @TestConfiguration?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@TestConfiguration</code> is a special Spring annotation used to define beans that are available <strong>only during testing</strong>.
+</p>
+
+<p>
+It behaves like <code>@Configuration</code>, but Spring does not automatically include it in the main application. This allows you to override or add beans specifically for tests without affecting production code.
+</p>
+
+<h3>🤔 Why do we need @TestConfiguration?</h3>
+
+<ul>
+<li>Create test-specific beans.</li>
+<li>Replace real beans with fake implementations.</li>
+<li>Avoid modifying production configuration.</li>
+<li>Customize the Spring Context for testing.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<pre><code>
+Test Class
+     │
+     ▼
+@TestConfiguration
+     │
+     ▼
+Custom Test Bean
+     │
+     ▼
+Spring Test Context
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Test Configuration</strong></p>
+
+<pre><code>@TestConfiguration
+public class TestConfig {
+
+    @Bean
+    public EmailService emailService() {
+
+        return new FakeEmailService();
+
+    }
+
+}
+</code></pre>
+
+<p><strong>Using the Configuration</strong></p>
+
+<pre><code>@SpringBootTest
+
+@Import(TestConfig.class)
+class ProductServiceTest {
+
+    @Autowired
+    EmailService emailService;
+
+}
+</code></pre>
+
+<p>
+During testing, Spring injects <code>FakeEmailService</code> instead of the real implementation.
+</p>
+
+<h3>⭐ @Configuration vs @TestConfiguration</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>@Configuration</th>
+<th>@TestConfiguration</th>
+</tr>
+
+<tr>
+<td>Used in the main application.</td>
+<td>Used only during tests.</td>
+</tr>
+
+<tr>
+<td>Loaded in production.</td>
+<td>Loaded only in the test context.</td>
+</tr>
+
+<tr>
+<td>Affects the application.</td>
+<td>Does not affect production code.</td>
+</tr>
+
+</table>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Defines beans only for tests.</li>
+<li>Does not affect production configuration.</li>
+<li>Useful for replacing external dependencies.</li>
+<li>Commonly used with <code>@Import</code>.</li>
+</ul>
+`
+},
 ];
 
 const tagMap = {
