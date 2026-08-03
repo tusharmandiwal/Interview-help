@@ -423,30 +423,1647 @@ const TOPICS = [
 ];
 
 const Q = [
-  {id:'core',q:'What is the Spring Framework?',a:'Spring is a lightweight, open-source Java framework used to build enterprise applications. Its core idea is Inversion of Control (IoC) and Dependency Injection (DI), which reduce tight coupling between components. Spring provides modules such as Spring Core, MVC, Data JPA, Security, AOP, and Boot. In interviews, mention that Spring makes applications modular, testable, and easier to maintain.'},
-  {id:'core',q:'What is the Spring IoC container?',a:'The IoC (Inversion of Control) container creates objects (beans), wires their dependencies, configures them, and manages their lifecycle. The two main implementations are <code>BeanFactory</code> (lazy, lightweight) and <code>ApplicationContext</code> (eager, feature-rich — preferred in most apps).'},
-  {id:'core',q:'What is a Spring Bean?',a:'A Spring Bean is any object managed by the Spring IoC container. Beans are created from bean definitions (via XML, annotations, or Java config), and Spring handles their instantiation, dependency injection, and destruction. By default, beans are singletons.'},
-  {id:'core',q:'What are the different bean scopes in Spring?',a:'Spring provides five scopes: <code>singleton</code> (one instance per container — default), <code>prototype</code> (new instance every time), <code>request</code> (one per HTTP request), <code>session</code> (one per HTTP session), and <code>application</code> (one per ServletContext). Web-aware scopes need a web-capable ApplicationContext.'},
-  {id:'core',q:'What is the difference between BeanFactory and ApplicationContext?',a:'<code>BeanFactory</code> is the basic container with lazy bean initialization. <code>ApplicationContext</code> extends it with eager initialization, event propagation, i18n, AOP integration, and environment abstraction. Use <code>ApplicationContext</code> in nearly all applications.'},
-  {id:'core',q:'What is the Spring bean lifecycle?',a:'The lifecycle goes: instantiation → populate properties → <code>BeanNameAware</code>/<code>BeanFactoryAware</code> callbacks → <code>BeanPostProcessor#postProcessBeforeInitialization</code> → <code>@PostConstruct</code>/init-method → <code>BeanPostProcessor#postProcessAfterInitialization</code> → bean in use → <code>@PreDestroy</code>/destroy-method → destruction.'},
-  {id:'core',q:'What are Spring configuration metadata types?',a:'Spring supports three types: XML-based (traditional <code>beans.xml</code>), annotation-based (<code>@Component</code>, <code>@Autowired</code>), and Java-based (<code>@Configuration</code> + <code>@Bean</code> methods). Modern apps prefer Java + annotation style.'},
-  {id:'core',q:'What is @Component and its specializations?',a:'<code>@Component</code> is the generic stereotype. Specializations: <code>@Service</code> (service layer), <code>@Repository</code> (DAO — also translates persistence exceptions), and <code>@Controller</code> / <code>@RestController</code> (web layer). All trigger classpath scanning.'},
-  {id:'core',q:"What is Spring's Environment abstraction?",a:'The <code>Environment</code> interface models two aspects: <strong>profiles</strong> (named logical groupings of bean definitions activated conditionally) and <strong>properties</strong> (key-value pairs from property files, system properties, environment variables, etc.).'},
-  {id:'core',q:'What is @Conditional?',a:'<code>@Conditional</code> registers a bean only when a condition is met. Implement <code>Condition</code> and override <code>matches()</code>. Spring Boot uses built-in conditionals heavily: <code>@ConditionalOnClass</code>, <code>@ConditionalOnMissingBean</code>, <code>@ConditionalOnProperty</code>, etc.'},
-  {id:'core',q:"What is Spring's event system?",a:'Spring provides an event model via <code>ApplicationEvent</code> and <code>ApplicationListener</code>. Publish with <code>ApplicationEventPublisher.publishEvent()</code>. Listen with <code>@EventListener</code> on any bean method. Supports <code>@Async</code> listeners. Built-in events: <code>ContextRefreshedEvent</code>, <code>ContextClosedEvent</code>.'},
+{
+  id: 'core',
+  q: 'What is the Spring Framework?',
+  a: `
+<h3>📖 Definition</h3>
 
-  {id:'di',q:'What is Dependency Injection (DI)?',a:'DI is a design pattern where an object\'s dependencies are provided by an external entity (the container) rather than the object creating them itself. Spring supports constructor injection (recommended for mandatory deps), setter injection (optional deps), and field injection.'},
-  {id:'di',q:'Constructor injection vs setter injection?',a:'Constructor injection passes dependencies via the constructor — ensures the object is always fully initialized and supports immutability. Setter injection uses setter methods — useful for optional dependencies. Spring recommends constructor injection for mandatory deps.'},
-  {id:'di',q:'What is @Autowired?',a:'<code>@Autowired</code> tells Spring to inject a dependency automatically by type. Placed on constructors, setters, or fields. If multiple beans match the type, use <code>@Qualifier</code> to disambiguate. Optional injection: <code>@Autowired(required=false)</code>.'},
-  {id:'di',q:'What is @Qualifier?',a:'<code>@Qualifier</code> is used alongside <code>@Autowired</code> to specify which bean to inject when multiple beans of the same type exist. Example: <code>@Autowired @Qualifier("mySpecificBean")</code>. You can also create custom qualifier annotations.'},
-  {id:'di',q:'What is @Primary?',a:'<code>@Primary</code> marks a bean as the preferred candidate when multiple beans of the same type exist and no <code>@Qualifier</code> is specified. It\'s a coarser-grained mechanism than <code>@Qualifier</code>.'},
-  {id:'di',q:'Difference between @Inject and @Autowired?',a:'<code>@Inject</code> is JSR-330 standard; <code>@Autowired</code> is Spring-specific. Both do type-based injection. <code>@Autowired</code> has the extra <code>required</code> attribute. <code>@Inject</code> uses <code>@Named</code> instead of <code>@Qualifier</code> for disambiguation.'},
-  {id:'di',q:'What is circular dependency in Spring?',a:'Circular dependency occurs when bean A depends on bean B and B depends on A. Spring resolves it for singletons using setter injection (three-level cache). Constructor injection circular dependencies always throw <code>BeanCurrentlyInCreationException</code>. Best fix: redesign to avoid the cycle.'},
-  {id:'di',q:'What is @Value?',a:'<code>@Value</code> injects values from property files, environment variables, or SpEL expressions. Example: <code>@Value("${app.name}")</code> injects the <code>app.name</code> property. SpEL: <code>@Value("#{systemProperties[\'user.home\']}")</code>.'},
-  {id:'di',q:'What is Spring Expression Language (SpEL)?',a:'SpEL is a powerful expression language supporting querying and manipulating object graphs at runtime: property access, method calls, math/logical operators, bean references. Used in <code>@Value</code>, XML config, and Spring Security.'},
-  {id:'di',q:'What is lazy initialization?',a:'<code>@Lazy</code> delays bean creation until first requested. Reduces startup time but may hide wiring errors until runtime. Set globally with <code>spring.main.lazy-initialization=true</code> in Spring Boot.'},
-  {id:'di',q:'What is lookup method injection?',a:'When a singleton needs a fresh prototype instance per method call, <code>@Lookup</code> on an abstract method makes Spring override it at runtime to return a new prototype bean on every invocation — bypassing the "singleton gets one prototype" limitation.'},
+<p>
+<strong>Spring Framework</strong> is a lightweight, open-source Java framework used to build enterprise applications. It simplifies Java development by providing features like Dependency Injection (DI), Inversion of Control (IoC), Transaction Management, Spring MVC, Spring Security, and Spring Data JPA.
+</p>
 
+<h3>🤔 Why do we need Spring?</h3>
+
+<ul>
+<li>Reduces boilerplate code.</li>
+<li>Promotes loose coupling between classes.</li>
+<li>Makes applications easier to test and maintain.</li>
+<li>Provides ready-to-use modules for web, database, security, and microservices.</li>
+<li>Lets developers focus on business logic instead of infrastructure code.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>Spring scans the project for components.</li>
+<li>Creates required objects (Beans).</li>
+<li>Injects dependencies automatically.</li>
+<li>Manages the complete lifecycle of beans.</li>
+<li>Provides various modules based on application requirements.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Service
+public class UserService {
+
+}
+
+@RestController
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Lightweight and open-source.</li>
+<li>Uses IoC and Dependency Injection.</li>
+<li>Supports modular development.</li>
+<li>Spring Boot is built on top of Spring Framework.</li>
+<li>Widely used for enterprise and microservice applications.</li>
+</ul>
+`
+},
+
+{
+  id: 'core',
+  q: 'What is the Spring IoC Container?',
+  a: `
+<h3>📖 Definition</h3>
+
+<p>
+The <strong>IoC (Inversion of Control) Container</strong> is the core of the Spring Framework. It creates, configures, manages, and destroys Spring Beans throughout the application lifecycle.
+</p>
+
+<h3>🤔 Why do we need IoC Container?</h3>
+
+<ul>
+<li>Removes manual object creation.</li>
+<li>Automatically injects dependencies.</li>
+<li>Manages bean lifecycle.</li>
+<li>Reduces tight coupling.</li>
+<li>Makes applications easier to maintain and test.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>Application starts.</li>
+<li>Spring reads configuration or annotations.</li>
+<li>Creates all required beans.</li>
+<li>Injects dependencies between beans.</li>
+<li>Stores beans inside the ApplicationContext.</li>
+<li>Destroys beans when the application shuts down.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Component
+public class Engine {
+
+}
+
+@Component
+public class Car {
+
+    private final Engine engine;
+
+    public Car(Engine engine) {
+        this.engine = engine;
+    }
+}
+</code></pre>
+
+<p>
+Spring automatically creates both objects and injects the <code>Engine</code> into the <code>Car</code>.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Core component of Spring.</li>
+<li>Creates and manages Spring Beans.</li>
+<li>Performs Dependency Injection.</li>
+<li>Manages Bean Lifecycle.</li>
+<li>Main implementations are BeanFactory and ApplicationContext.</li>
+</ul>
+`
+},
+
+{
+  id: 'core',
+  q: 'What is a Spring Bean?',
+  a: `
+<h3>📖 Definition</h3>
+
+<p>
+A <strong>Spring Bean</strong> is any Java object that is created, managed, and maintained by the Spring IoC Container.
+</p>
+
+<p>
+Instead of creating objects using the <code>new</code> keyword, Spring creates them automatically and injects them wherever required.
+</p>
+
+<h3>🤔 Why do we need Spring Beans?</h3>
+
+<ul>
+<li>Automatic object creation.</li>
+<li>Automatic dependency injection.</li>
+<li>Lifecycle management.</li>
+<li>Improves code reusability.</li>
+<li>Easy unit testing.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>Spring scans classes annotated with <code>@Component</code>, <code>@Service</code>, <code>@Repository</code>, etc.</li>
+<li>Creates objects of those classes.</li>
+<li>Stores them inside the IoC Container.</li>
+<li>Injects them wherever needed.</li>
+<li>Manages their lifecycle automatically.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Service
+public class ProductService {
+
+}
+
+@RestController
+public class ProductController {
+
+    private final ProductService productService;
+
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
+}
+</code></pre>
+
+<p>
+Here, both <code>ProductService</code> and <code>ProductController</code> are Spring Beans managed by the IoC Container.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>A Bean is simply an object managed by Spring.</li>
+<li>Default bean scope is Singleton.</li>
+<li>Beans are stored inside the ApplicationContext.</li>
+<li>Beans can be created using annotations or <code>@Bean</code> methods.</li>
+<li>Spring manages the complete bean lifecycle.</li>
+</ul>
+`
+},
+  {
+  id: 'core',
+  q: 'What are the different Bean Scopes in Spring?',
+  a: `
+<h3>📖 Definition</h3>
+
+<p>
+A <strong>Bean Scope</strong> defines how many instances of a Spring Bean are created and how long those instances live inside the Spring IoC Container.
+</p>
+
+<h3>🤔 Why do we need Bean Scopes?</h3>
+
+<ul>
+<li>Control the lifecycle of beans.</li>
+<li>Decide whether a bean should be shared or newly created.</li>
+<li>Improve memory usage.</li>
+<li>Support different application requirements such as web requests and user sessions.</li>
+</ul>
+
+<h3>⚙️ Types of Bean Scopes</h3>
+
+<table border="1" cellpadding="6" cellspacing="0">
+<tr>
+<th>Scope</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td><code>singleton</code></td>
+<td>One shared object for the entire Spring Container (Default).</td>
+</tr>
+
+<tr>
+<td><code>prototype</code></td>
+<td>A new object is created every time the bean is requested.</td>
+</tr>
+
+<tr>
+<td><code>request</code></td>
+<td>One bean is created for each HTTP request.</td>
+</tr>
+
+<tr>
+<td><code>session</code></td>
+<td>One bean is created for each user session.</td>
+</tr>
+
+<tr>
+<td><code>application</code></td>
+<td>One bean is shared across the entire web application.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Component
+@Scope("prototype")
+public class ReportGenerator {
+
+}
+</code></pre>
+
+<p>
+Every time Spring requests <code>ReportGenerator</code>, a new object is created.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Default scope is <code>singleton</code>.</li>
+<li><code>prototype</code> creates a new object every time.</li>
+<li>Request, Session and Application scopes are available only in web applications.</li>
+<li>Choose the scope based on application requirements.</li>
+</ul>
+`
+},
+
+{
+  id: 'core',
+  q: 'What is the difference between BeanFactory and ApplicationContext?',
+  a: `
+<h3>📖 Definition</h3>
+
+<p>
+Both <strong>BeanFactory</strong> and <strong>ApplicationContext</strong> are Spring IoC Containers. ApplicationContext is an advanced version of BeanFactory that provides many additional enterprise features.
+</p>
+
+<h3>🤔 Why do we need two containers?</h3>
+
+<ul>
+<li>BeanFactory provides basic dependency injection.</li>
+<li>ApplicationContext provides enterprise-level features.</li>
+<li>Modern Spring Boot applications use ApplicationContext.</li>
+</ul>
+
+<h3>⚙️ Comparison</h3>
+
+<table border="1" cellpadding="6" cellspacing="0">
+
+<tr>
+<th>BeanFactory</th>
+<th>ApplicationContext</th>
+</tr>
+
+<tr>
+<td>Basic IoC Container</td>
+<td>Advanced IoC Container</td>
+</tr>
+
+<tr>
+<td>Lazy Bean Initialization</td>
+<td>Eager Singleton Initialization</td>
+</tr>
+
+<tr>
+<td>No Event Support</td>
+<td>Supports Events</td>
+</tr>
+
+<tr>
+<td>No Internationalization</td>
+<td>Supports i18n</td>
+</tr>
+
+<tr>
+<td>Limited Features</td>
+<td>Supports AOP, Profiles, Environment, Validation</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>ApplicationContext context =
+        new AnnotationConfigApplicationContext(AppConfig.class);
+
+UserService service =
+        context.getBean(UserService.class);
+</code></pre>
+
+<p>
+Spring Boot automatically creates an <code>ApplicationContext</code> when the application starts.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>ApplicationContext extends BeanFactory.</li>
+<li>ApplicationContext is used in almost every Spring Boot application.</li>
+<li>BeanFactory is rarely used directly in modern applications.</li>
+</ul>
+`
+},
+
+{
+  id: 'core',
+  q: 'What is the Spring Bean Lifecycle?',
+  a: `
+<h3>📖 Definition</h3>
+
+<p>
+The <strong>Bean Lifecycle</strong> describes the complete journey of a Spring Bean from its creation until it is destroyed by the Spring Container.
+</p>
+
+<h3>🤔 Why is Bean Lifecycle important?</h3>
+
+<ul>
+<li>Initialize resources before using a bean.</li>
+<li>Release resources before application shutdown.</li>
+<li>Customize bean behavior during creation.</li>
+<li>Improve resource management.</li>
+</ul>
+
+<h3>⚙️ Bean Lifecycle Steps</h3>
+
+<ol>
+<li>Spring creates the Bean.</li>
+<li>Dependencies are injected.</li>
+<li><code>BeanPostProcessor</code> executes before initialization.</li>
+<li><code>@PostConstruct</code> method is called.</li>
+<li>Bean becomes ready for use.</li>
+<li><code>BeanPostProcessor</code> executes after initialization.</li>
+<li>When the application stops, <code>@PreDestroy</code> method is called.</li>
+<li>Bean is destroyed.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Component
+public class DatabaseConnection {
+
+    @PostConstruct
+    public void init() {
+        System.out.println("Connection Created");
+    }
+
+    @PreDestroy
+    public void destroy() {
+        System.out.println("Connection Closed");
+    }
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Spring manages the complete lifecycle automatically.</li>
+<li><code>@PostConstruct</code> runs after dependency injection.</li>
+<li><code>@PreDestroy</code> runs before bean destruction.</li>
+<li>BeanPostProcessor can customize beans before and after initialization.</li>
+</ul>
+`
+},
+  {
+  id: 'core',
+  q: 'What are Spring Configuration Metadata Types?',
+  a: `
+<h3>📖 Definition</h3>
+
+<p>
+Configuration Metadata tells the Spring IoC Container how to create, configure, and manage Spring Beans. It defines what beans should be created, their dependencies, and their lifecycle.
+</p>
+
+<h3>🤔 Why do we need Configuration Metadata?</h3>
+
+<ul>
+<li>To tell Spring which classes should become Beans.</li>
+<li>To configure dependencies between Beans.</li>
+<li>To avoid creating objects manually.</li>
+<li>To make application configuration easy to maintain.</li>
+</ul>
+
+<h3>⚙️ Types of Configuration</h3>
+
+<table border="1" cellpadding="6">
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td>XML Configuration</td>
+<td>Uses XML files like <code>beans.xml</code>. Mostly used in older Spring applications.</td>
+</tr>
+
+<tr>
+<td>Annotation Configuration</td>
+<td>Uses annotations such as <code>@Component</code>, <code>@Service</code>, and <code>@Autowired</code>.</td>
+</tr>
+
+<tr>
+<td>Java Configuration</td>
+<td>Uses <code>@Configuration</code> and <code>@Bean</code> methods to define Beans.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Configuration
+public class AppConfig {
+
+    @Bean
+    public UserService userService() {
+        return new UserService();
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Modern Spring Boot applications mainly use Annotation + Java Configuration.</li>
+<li>XML configuration is mostly used in legacy projects.</li>
+<li>Java Configuration provides type safety and better readability.</li>
+</ul>
+`
+},
+
+{
+  id: 'core',
+  q: 'What is @Component and its Specializations?',
+  a: `
+<h3>📖 Definition</h3>
+
+<p>
+<strong>@Component</strong> is a generic stereotype annotation that tells Spring to automatically detect and register the class as a Spring Bean during component scanning.
+</p>
+
+<h3>🤔 Why do we need @Component?</h3>
+
+<ul>
+<li>Automatically creates Spring Beans.</li>
+<li>Removes the need for manual bean configuration.</li>
+<li>Supports Dependency Injection.</li>
+<li>Makes code cleaner and easier to maintain.</li>
+</ul>
+
+<h3>⚙️ Specializations of @Component</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Annotation</th>
+<th>Purpose</th>
+</tr>
+
+<tr>
+<td><code>@Component</code></td>
+<td>Generic Spring Bean.</td>
+</tr>
+
+<tr>
+<td><code>@Service</code></td>
+<td>Business Logic Layer.</td>
+</tr>
+
+<tr>
+<td><code>@Repository</code></td>
+<td>Data Access Layer (DAO). Also converts database exceptions into Spring exceptions.</td>
+</tr>
+
+<tr>
+<td><code>@Controller</code></td>
+<td>Spring MVC Controller.</td>
+</tr>
+
+<tr>
+<td><code>@RestController</code></td>
+<td>REST API Controller. Returns JSON/XML responses.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Service
+public class ProductService {
+
+}
+
+@Repository
+public class ProductRepository {
+
+}
+
+@RestController
+public class ProductController {
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>All these annotations are special forms of <code>@Component</code>.</li>
+<li>They improve code readability by identifying the layer of the application.</li>
+<li>Spring automatically detects them during component scanning.</li>
+</ul>
+`
+},
+
+{
+  id: 'core',
+  q: "What is Spring's Environment Abstraction?",
+  a: `
+<h3>📖 Definition</h3>
+
+<p>
+The <strong>Environment</strong> interface provides access to application properties and active profiles. It allows applications to load different configurations based on the environment, such as Development, Testing, or Production.
+</p>
+
+<h3>🤔 Why do we need Environment?</h3>
+
+<ul>
+<li>Read values from <code>application.properties</code> or <code>application.yml</code>.</li>
+<li>Support multiple environments like Dev, Test, and Production.</li>
+<li>Access system properties and environment variables.</li>
+<li>Avoid hardcoding configuration values.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>Spring loads configuration files during startup.</li>
+<li>The Environment object stores all configuration values.</li>
+<li>Beans can read these values using <code>@Value</code> or the <code>Environment</code> interface.</li>
+<li>Active profiles determine which configuration files are loaded.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Component
+public class AppInfo {
+
+    @Value("\${spring.application.name}")
+    private String appName;
+
+}
+</code></pre>
+
+<p>Or using the Environment interface:</p>
+
+<pre><code>@Autowired
+private Environment environment;
+
+String port = environment.getProperty("server.port");
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Used to access application configuration.</li>
+<li>Supports multiple profiles.</li>
+<li>Works with properties, YAML files, environment variables, and system properties.</li>
+<li>Widely used in Spring Boot applications.</li>
+</ul>
+`
+},
+{
+  id: 'core',
+  q: 'What is @Conditional?',
+  a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@Conditional</code> is an annotation that tells Spring to create a Bean only if a specified condition is true. If the condition is not satisfied, Spring skips creating that Bean.
+</p>
+
+<h3>🤔 Why do we need @Conditional?</h3>
+
+<ul>
+<li>Create Beans only when required.</li>
+<li>Avoid unnecessary Bean creation.</li>
+<li>Support different environments (Dev, Test, Production).</li>
+<li>Enable or disable features based on configuration.</li>
+<li>Used heavily by Spring Boot Auto Configuration.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>Spring starts scanning configuration classes.</li>
+<li>It checks the condition specified in <code>@Conditional</code>.</li>
+<li>If the condition is true, the Bean is created.</li>
+<li>If the condition is false, the Bean is ignored.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Configuration
+public class AppConfig {
+
+    @Bean
+    @ConditionalOnProperty(
+        name = "feature.email.enabled",
+        havingValue = "true"
+    )
+    public EmailService emailService() {
+        return new EmailService();
+    }
+
+}
+</code></pre>
+
+<p>
+If <code>feature.email.enabled=true</code>, Spring creates the <code>EmailService</code> bean. Otherwise, it is skipped.
+</p>
+
+<h3>⭐ Common Conditional Annotations</h3>
+
+<ul>
+<li><code>@ConditionalOnClass</code> – Create Bean if a class exists.</li>
+<li><code>@ConditionalOnMissingBean</code> – Create Bean only if another Bean doesn't exist.</li>
+<li><code>@ConditionalOnBean</code> – Create Bean only if another Bean exists.</li>
+<li><code>@ConditionalOnProperty</code> – Create Bean based on a property value.</li>
+<li><code>@ConditionalOnWebApplication</code> – Create Bean only in a web application.</li>
+</ul>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Controls Bean creation.</li>
+<li>Reduces unnecessary configuration.</li>
+<li>Widely used inside Spring Boot Auto Configuration.</li>
+<li>Helps create flexible and configurable applications.</li>
+</ul>
+`
+},
+
+{
+  id: 'core',
+  q: "What is Spring's Event System?",
+  a: `
+<h3>📖 Definition</h3>
+
+<p>
+Spring's Event System allows different parts of an application to communicate with each other without being tightly coupled. One component publishes an event, and other components can listen and react to it.
+</p>
+
+<h3>🤔 Why do we need Events?</h3>
+
+<ul>
+<li>Reduce dependency between components.</li>
+<li>Execute additional tasks after an action.</li>
+<li>Improve application modularity.</li>
+<li>Support asynchronous processing.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>An event is created.</li>
+<li>The event is published using <code>ApplicationEventPublisher</code>.</li>
+<li>Spring notifies all matching event listeners.</li>
+<li>The listener executes its business logic.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Publish an Event</strong></p>
+
+<pre><code>@Service
+public class UserService {
+
+    @Autowired
+    private ApplicationEventPublisher publisher;
+
+    public void registerUser() {
+
+        // Save user
+
+        publisher.publishEvent(new UserRegisteredEvent(this));
+
+    }
+
+}
+</code></pre>
+
+<p><strong>Listen for the Event</strong></p>
+
+<pre><code>@Component
+public class EmailListener {
+
+    @EventListener
+    public void sendWelcomeEmail(UserRegisteredEvent event) {
+
+        System.out.println("Welcome Email Sent");
+
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Common Built-in Events</h3>
+
+<ul>
+<li><code>ContextRefreshedEvent</code></li>
+<li><code>ContextStartedEvent</code></li>
+<li><code>ContextStoppedEvent</code></li>
+<li><code>ContextClosedEvent</code></li>
+<li><code>ApplicationReadyEvent</code> (Spring Boot)</li>
+</ul>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Based on the Publisher-Subscriber pattern.</li>
+<li>Uses <code>ApplicationEventPublisher</code> to publish events.</li>
+<li>Uses <code>@EventListener</code> to receive events.</li>
+<li>Can be combined with <code>@Async</code> for asynchronous event handling.</li>
+<li>Helps build loosely coupled applications.</li>
+</ul>
+`
+},
+
+{
+    id: 'di',
+    q: 'What is Dependency Injection (DI)?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<strong>Dependency Injection (DI)</strong> is a design pattern in which the Spring IoC Container creates the required objects (called dependencies) and injects them into another class instead of the class creating them using the <code>new</code> keyword.
+</p>
+
+<p>
+This reduces the dependency between classes, making the application easier to maintain, test, and extend.
+</p>
+
+<h3>🤔 Why do we need Dependency Injection?</h3>
+
+<ul>
+<li>Reduces tight coupling between classes.</li>
+<li>Makes code reusable and modular.</li>
+<li>Improves unit testing by allowing mock objects.</li>
+<li>Allows changing implementations without modifying business logic.</li>
+<li>Spring automatically manages object creation and dependency injection.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>Spring scans the application for Beans.</li>
+<li>The IoC Container creates the required Bean objects.</li>
+<li>It checks which Bean depends on another Bean.</li>
+<li>Spring automatically injects the required dependency.</li>
+<li>The application uses the injected object without creating it manually.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Without Dependency Injection</strong></p>
+
+<pre><code>public class Car {
+
+    private Engine engine = new Engine();
+
+}
+</code></pre>
+
+<p>The <code>Car</code> class is tightly coupled to the <code>Engine</code> class because it creates the object itself.</p>
+
+<p><strong>With Dependency Injection</strong></p>
+
+<pre><code>@Component
+public class Engine {
+
+}
+
+@Component
+public class Car {
+
+    private final Engine engine;
+
+    public Car(Engine engine) {
+        this.engine = engine;
+    }
+
+}
+</code></pre>
+
+<p>Spring automatically creates both Beans and injects the <code>Engine</code> into the <code>Car</code>.</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Dependency Injection is an implementation of IoC.</li>
+<li>Spring manages object creation instead of the developer.</li>
+<li>Promotes loose coupling.</li>
+<li>Constructor Injection is the recommended approach.</li>
+</ul>
+`
+},
+
+{
+    id: 'di',
+    q: 'Constructor Injection vs Setter Injection',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Spring provides multiple ways to inject dependencies into a Bean. The two most common approaches are <strong>Constructor Injection</strong> and <strong>Setter Injection</strong>.
+</p>
+
+<h3>🤔 Why do we need different injection types?</h3>
+
+<ul>
+<li>Some dependencies are mandatory.</li>
+<li>Some dependencies are optional.</li>
+<li>Different situations require different injection styles.</li>
+</ul>
+
+<h3>⚙️ Comparison</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Constructor Injection</th>
+<th>Setter Injection</th>
+</tr>
+
+<tr>
+<td>Dependencies are passed through the constructor.</td>
+<td>Dependencies are injected using setter methods.</td>
+</tr>
+
+<tr>
+<td>Best for mandatory dependencies.</td>
+<td>Best for optional dependencies.</td>
+</tr>
+
+<tr>
+<td>Supports <code>final</code> fields.</td>
+<td>Fields cannot be final.</td>
+</tr>
+
+<tr>
+<td>Object is fully initialized after creation.</td>
+<td>Dependency can be changed later.</td>
+</tr>
+
+<tr>
+<td>Recommended in modern Spring Boot.</td>
+<td>Less commonly used.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Constructor Injection</strong></p>
+
+<pre><code>@Service
+public class UserService {
+
+    private final UserRepository repository;
+
+    public UserService(UserRepository repository) {
+        this.repository = repository;
+    }
+
+}
+</code></pre>
+
+<p><strong>Setter Injection</strong></p>
+
+<pre><code>@Service
+public class UserService {
+
+    private UserRepository repository;
+
+    @Autowired
+    public void setRepository(UserRepository repository) {
+        this.repository = repository;
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Use Constructor Injection for mandatory dependencies.</li>
+<li>Use Setter Injection for optional dependencies.</li>
+<li>Spring recommends Constructor Injection.</li>
+</ul>
+`
+},
+
+{
+    id: 'di',
+    q: 'What is @Autowired?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@Autowired</code> is an annotation that tells Spring to automatically inject a matching Bean into another Bean.
+</p>
+
+<p>
+Instead of creating objects manually, Spring searches the IoC Container for a matching Bean and injects it automatically.
+</p>
+
+<h3>🤔 Why do we need @Autowired?</h3>
+
+<ul>
+<li>Removes manual object creation.</li>
+<li>Automatically resolves dependencies.</li>
+<li>Reduces boilerplate code.</li>
+<li>Works with Constructor, Setter, and Field Injection.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>Spring creates all Beans.</li>
+<li>When it finds <code>@Autowired</code>, it searches for a matching Bean.</li>
+<li>If one Bean is found, it is injected automatically.</li>
+<li>If multiple Beans are found, use <code>@Qualifier</code> or <code>@Primary</code>.</li>
+<li>If no matching Bean exists, Spring throws an exception.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Service
+public class PaymentService {
+
+}
+
+@RestController
+public class OrderController {
+
+    private final PaymentService paymentService;
+
+    @Autowired
+    public OrderController(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Injects Beans automatically.</li>
+<li>Works by type.</li>
+<li>Can be used on constructors, setters, and fields.</li>
+<li>Constructor Injection is the preferred approach.</li>
+<li>Use <code>@Qualifier</code> when multiple Beans of the same type exist.</li>
+</ul>
+`
+},
+
+{
+    id: 'di',
+    q: 'What is @Qualifier?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@Qualifier</code> is used along with <code>@Autowired</code> to specify which Bean should be injected when multiple Beans of the same type are available.
+</p>
+
+<p>
+Without <code>@Qualifier</code>, Spring cannot decide which Bean to inject and throws <code>NoUniqueBeanDefinitionException</code>.
+</p>
+
+<h3>🤔 Why do we need @Qualifier?</h3>
+
+<ul>
+<li>Resolve ambiguity when multiple Beans of the same type exist.</li>
+<li>Select a specific implementation.</li>
+<li>Give more control over dependency injection.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>Spring searches for all Beans of the required type.</li>
+<li>If only one Bean exists, it injects it automatically.</li>
+<li>If multiple Beans exist, Spring checks for <code>@Qualifier</code>.</li>
+<li>The Bean whose name matches the qualifier is injected.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>public interface PaymentService{
+    void pay();
+}
+
+@Service("upiPayment")
+class UpiPaymentService implements PaymentService{
+
+    public void pay(){ }
+
+}
+
+@Service("cardPayment")
+class CardPaymentService implements PaymentService{
+
+    public void pay(){ }
+
+}
+
+@Service
+class OrderService{
+
+    private final PaymentService paymentService;
+
+    public OrderService(
+            @Qualifier("upiPayment")
+            PaymentService paymentService){
+
+        this.paymentService = paymentService;
+
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Used with <code>@Autowired</code>.</li>
+<li>Resolves multiple Bean conflicts.</li>
+<li>Selects a specific Bean by name.</li>
+<li>Takes higher priority than <code>@Primary</code>.</li>
+</ul>
+`
+},
+
+{
+    id: 'di',
+    q: 'What is @Primary?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@Primary</code> marks a Bean as the default Bean to use when multiple Beans of the same type are available.
+</p>
+
+<p>
+If no <code>@Qualifier</code> is specified, Spring injects the Bean marked with <code>@Primary</code>.
+</p>
+
+<h3>🤔 Why do we need @Primary?</h3>
+
+<ul>
+<li>Provide a default implementation.</li>
+<li>Avoid writing <code>@Qualifier</code> everywhere.</li>
+<li>Simplify dependency injection.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>Spring finds multiple Beans of the same type.</li>
+<li>It checks whether one Bean is marked with <code>@Primary</code>.</li>
+<li>If found, that Bean is injected automatically.</li>
+<li>If <code>@Qualifier</code> is present, it overrides <code>@Primary</code>.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>public interface NotificationService{
+
+    void send();
+
+}
+
+@Service
+@Primary
+class EmailService implements NotificationService{
+
+    public void send(){ }
+
+}
+
+@Service
+class SmsService implements NotificationService{
+
+    public void send(){ }
+
+}
+
+@Service
+class UserService{
+
+    private final NotificationService notificationService;
+
+    public UserService(NotificationService notificationService){
+
+        this.notificationService = notificationService;
+
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Marks the default Bean.</li>
+<li>Works only when multiple Beans exist.</li>
+<li><code>@Qualifier</code> overrides <code>@Primary</code>.</li>
+<li>Useful when one implementation is used most of the time.</li>
+</ul>
+`
+},
+
+{
+    id: 'di',
+    q: 'Difference between @Inject and @Autowired',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Both <code>@Inject</code> and <code>@Autowired</code> are used for Dependency Injection. Their purpose is the same, but they come from different libraries.
+</p>
+
+<h3>🤔 Why are there two annotations?</h3>
+
+<ul>
+<li><code>@Autowired</code> is provided by Spring Framework.</li>
+<li><code>@Inject</code> is part of the Jakarta Dependency Injection (JSR-330) specification.</li>
+<li>Spring supports both annotations.</li>
+</ul>
+
+<h3>⚙️ Comparison</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>@Autowired</th>
+<th>@Inject</th>
+</tr>
+
+<tr>
+<td>Spring-specific annotation.</td>
+<td>Jakarta (JSR-330) standard.</td>
+</tr>
+
+<tr>
+<td>Package: <code>org.springframework.beans.factory.annotation</code></td>
+<td>Package: <code>jakarta.inject</code></td>
+</tr>
+
+<tr>
+<td>Supports <code>required=false</code>.</td>
+<td>No <code>required</code> attribute.</td>
+</tr>
+
+<tr>
+<td>Works with <code>@Qualifier</code>.</td>
+<td>Usually works with <code>@Named</code>.</td>
+</tr>
+
+<tr>
+<td>Most commonly used in Spring Boot.</td>
+<td>Useful when writing framework-independent code.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Using @Autowired</strong></p>
+
+<pre><code>@Autowired
+private UserService userService;
+</code></pre>
+
+<p><strong>Using @Inject</strong></p>
+
+<pre><code>@Inject
+private UserService userService;
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Both perform Dependency Injection.</li>
+<li><code>@Autowired</code> is Spring-specific.</li>
+<li><code>@Inject</code> follows the Jakarta standard.</li>
+<li>In Spring Boot projects, <code>@Autowired</code> is more commonly used.</li>
+</ul>
+`
+},
+{
+    id: 'di',
+    q: 'What is Circular Dependency in Spring?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+A <strong>Circular Dependency</strong> occurs when two or more Spring Beans depend on each other directly or indirectly. Since each bean waits for the other to be created first, Spring cannot complete the dependency injection process.
+</p>
+
+<p>
+For example, if <code>Bean A</code> depends on <code>Bean B</code>, and <code>Bean B</code> also depends on <code>Bean A</code>, a circular dependency is created.
+</p>
+
+<h3>🤔 Why is it a problem?</h3>
+
+<ul>
+<li>Spring cannot create the required beans.</li>
+<li>The application may fail to start.</li>
+<li>It indicates tightly coupled design.</li>
+<li>Makes the application difficult to maintain.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<p><strong>Normal Dependency</strong></p>
+
+<pre><code>A  →  B  →  C
+</code></pre>
+
+<p>Spring creates C, then B, then A.</p>
+
+<p><strong>Circular Dependency</strong></p>
+
+<pre><code>A  →  B
+↑     ↓
+└─────┘
+</code></pre>
+
+<p>
+Neither Bean can be created first, so Spring throws a <code>BeanCurrentlyInCreationException</code>.
+</p>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Service
+class ServiceA {
+
+    private final ServiceB serviceB;
+
+    public ServiceA(ServiceB serviceB) {
+        this.serviceB = serviceB;
+    }
+
+}
+
+@Service
+class ServiceB {
+
+    private final ServiceA serviceA;
+
+    public ServiceB(ServiceA serviceA) {
+        this.serviceA = serviceA;
+    }
+
+}
+</code></pre>
+
+<h3>✅ Ways to Resolve It</h3>
+
+<ul>
+<li>Redesign the application to remove the dependency cycle.</li>
+<li>Use <code>@Lazy</code> on one dependency.</li>
+<li>Use Setter Injection if appropriate.</li>
+<li>Create a separate service to handle shared logic.</li>
+</ul>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Constructor Injection cannot resolve circular dependencies.</li>
+<li>Usually indicates poor application design.</li>
+<li>Best solution is to redesign the classes.</li>
+</ul>
+`
+},
+
+{
+    id: 'di',
+    q: 'What is @Value?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@Value</code> is an annotation used to inject values into a Spring Bean. These values can come from <code>application.properties</code>, <code>application.yml</code>, environment variables, system properties, or Spring Expression Language (SpEL).
+</p>
+
+<h3>🤔 Why do we need @Value?</h3>
+
+<ul>
+<li>Read configuration values.</li>
+<li>Avoid hardcoding values in code.</li>
+<li>Support different configurations for different environments.</li>
+<li>Inject constant values into Beans.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>Spring loads configuration files.</li>
+<li>It searches for the property key.</li>
+<li>The value is injected into the Bean.</li>
+<li>The Bean can use the value anywhere in the application.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>application.properties</strong></p>
+
+<pre><code>spring.application.name=InventoryService
+server.port=8081
+</code></pre>
+
+<p><strong>Reading Values</strong></p>
+
+<pre><code>@Component
+public class AppInfo {
+
+    @Value("\${spring.application.name}")
+    private String appName;
+
+    @Value("\${server.port}")
+    private int port;
+
+}
+</code></pre>
+
+<p><strong>Default Value</strong></p>
+
+<pre><code>@Value("\${server.port:8080}")
+private int port;
+</code></pre>
+
+<p>
+If the property is missing, Spring uses <code>8080</code> as the default value.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Reads values from configuration files.</li>
+<li>Supports default values.</li>
+<li>Can evaluate SpEL expressions.</li>
+<li>Mainly used for simple configuration values.</li>
+</ul>
+`
+},
+
+{
+    id: 'di',
+    q: 'What is Spring Expression Language (SpEL)?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Spring Expression Language (<strong>SpEL</strong>) is a powerful expression language used to evaluate expressions at runtime. It can access Bean properties, call methods, perform calculations, and evaluate conditions.
+</p>
+
+<h3>🤔 Why do we need SpEL?</h3>
+
+<ul>
+<li>Perform dynamic calculations.</li>
+<li>Read Bean properties.</li>
+<li>Call methods inside expressions.</li>
+<li>Write dynamic configuration.</li>
+<li>Used in Spring Security and @Value.</li>
+</ul>
+
+<h3>⚙️ Common Uses</h3>
+
+<ul>
+<li>Inside <code>@Value</code></li>
+<li>Spring Security (<code>@PreAuthorize</code>)</li>
+<li>Conditional configuration</li>
+<li>Bean property access</li>
+</ul>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Simple Calculation</strong></p>
+
+<pre><code>@Value("#{10 + 20}")
+private int total;
+</code></pre>
+
+<p><strong>Read System Property</strong></p>
+
+<pre><code>@Value("#{systemProperties['user.home']}")
+private String homeDirectory;
+</code></pre>
+
+<p><strong>Access Another Bean</strong></p>
+
+<pre><code>@Value("#{userService.userCount}")
+private int totalUsers;
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>SpEL expressions are written inside <code>#{ }</code>.</li>
+<li>Supports mathematical and logical operations.</li>
+<li>Can access Bean properties and methods.</li>
+<li>Frequently used with <code>@Value</code> and Spring Security.</li>
+</ul>
+`
+},
+{
+    id: 'di',
+    q: 'What is Lazy Initialization (@Lazy)?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+By default, Spring creates all <strong>Singleton</strong> Beans when the application starts. This is called <strong>Eager Initialization</strong>.
+</p>
+
+<p>
+The <code>@Lazy</code> annotation tells Spring to delay the creation of a Bean until it is actually needed for the first time. This is known as <strong>Lazy Initialization</strong>.
+</p>
+
+<h3>🤔 Why do we need @Lazy?</h3>
+
+<ul>
+<li>Reduce application startup time.</li>
+<li>Create expensive objects only when required.</li>
+<li>Save memory during application startup.</li>
+<li>Help resolve some circular dependency issues.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<p><strong>Without @Lazy</strong></p>
+
+<pre><code>Application Starts
+        │
+        ▼
+Spring creates all Singleton Beans
+        │
+        ▼
+Application Ready
+</code></pre>
+
+<p><strong>With @Lazy</strong></p>
+
+<pre><code>Application Starts
+        │
+        ▼
+Bean is NOT created
+        │
+        ▼
+Bean is requested
+        │
+        ▼
+Spring creates the Bean
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Component
+@Lazy
+public class ReportGenerator {
+
+    public ReportGenerator() {
+        System.out.println("Bean Created");
+    }
+
+}
+</code></pre>
+
+<p>
+The <code>ReportGenerator</code> Bean will be created only when another Bean requests it.
+</p>
+
+<p><strong>Using @Lazy during Injection</strong></p>
+
+<pre><code>@Service
+public class UserService {
+
+    private final ReportGenerator generator;
+
+    public UserService(@Lazy ReportGenerator generator) {
+        this.generator = generator;
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Default Spring behavior is Eager Initialization.</li>
+<li><code>@Lazy</code> delays Bean creation.</li>
+<li>Improves startup performance.</li>
+<li>Useful for expensive or rarely used Beans.</li>
+</ul>
+`
+},
+
+{
+    id: 'di',
+    q: 'What is Lookup Method Injection (@Lookup)?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@Lookup</code> is used when a <strong>Singleton Bean</strong> needs a new instance of a <strong>Prototype Bean</strong> every time a method is called.
+</p>
+
+<p>
+Normally, if a Prototype Bean is injected into a Singleton Bean, Spring injects it only once. Using <code>@Lookup</code>, Spring creates a fresh Prototype Bean whenever the method is invoked.
+</p>
+
+<h3>🤔 Why do we need @Lookup?</h3>
+
+<ul>
+<li>Allow Singleton Beans to use Prototype Beans correctly.</li>
+<li>Create a new object on every method call.</li>
+<li>Avoid manually fetching Beans from ApplicationContext.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<p><strong>Without @Lookup</strong></p>
+
+<pre><code>Singleton Bean
+      │
+      ▼
+Prototype Bean
+
+Only one Prototype object is injected.
+</code></pre>
+
+<p><strong>With @Lookup</strong></p>
+
+<pre><code>Singleton Bean
+      │
+      ├────► Prototype Object 1
+      ├────► Prototype Object 2
+      └────► Prototype Object 3
+</code></pre>
+
+<p>
+Every method call returns a brand-new Prototype Bean.
+</p>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Component
+@Scope("prototype")
+public class Task {
+
+}
+
+@Component
+public class TaskManager {
+
+    public void process() {
+
+        Task task = getTask();
+
+        // Use Task
+
+    }
+
+    @Lookup
+    public Task getTask() {
+        return null;
+    }
+
+}
+</code></pre>
+
+<p>
+Spring overrides the <code>getTask()</code> method at runtime and returns a new <code>Task</code> object every time it is called.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Used when Singleton depends on Prototype.</li>
+<li>Returns a new Prototype Bean on every call.</li>
+<li>Implemented internally using Spring-generated subclasses.</li>
+<li>Rarely used in normal Spring Boot applications but important to know.</li>
+</ul>
+`
+},
   {id:'boot',q:'What is Spring Boot?',a:'Spring Boot is an opinionated extension of Spring that provides auto-configuration, embedded servers (Tomcat/Jetty/Undertow), starter dependencies, Actuator, and eliminates boilerplate XML/Java config. Run anywhere with <code>java -jar</code>.'},
   {id:'boot',q:'What is Spring Boot auto-configuration?',a:'Auto-configuration automatically configures beans based on classpath JARs and your own config. Enabled by <code>@EnableAutoConfiguration</code> (included in <code>@SpringBootApplication</code>). Spring Boot reads <code>AutoConfiguration.imports</code> and applies classes conditionally.'},
   {id:'boot',q:'What does @SpringBootApplication do?',a:'It combines three annotations: <code>@Configuration</code> (marks as config source), <code>@EnableAutoConfiguration</code> (enables auto-config), and <code>@ComponentScan</code> (component scanning from the annotated class\'s package).'},
