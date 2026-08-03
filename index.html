@@ -4912,18 +4912,967 @@ List&lt;Product&gt; findProductsNative(
 </ul>
 `
 },
-  {id:'sec',q:'What is Spring Security?',a:'A powerful authentication and access-control framework. It integrates with the Servlet filter chain to intercept requests and enforce security rules before they reach your application. Supports password auth, OAuth2/OIDC, JWT, LDAP, and more.'},
-  {id:'sec',q:"How does Spring Security's filter chain work?",a:'<code>DelegatingFilterProxy</code> delegates to <code>FilterChainProxy</code>, which manages multiple <code>SecurityFilterChain</code> instances. Each chain has ordered security filters (e.g., <code>UsernamePasswordAuthenticationFilter</code>, <code>JwtFilter</code>) applied to matching requests.'},
-  {id:'sec',q:'Authentication vs Authorization?',a:'Authentication verifies identity (who are you?). Authorization determines access (what can you do?). The authenticated user is stored in <code>SecurityContext</code> as an <code>Authentication</code> object containing principal, credentials, and granted authorities.'},
-  {id:'sec',q:'What is UserDetailsService?',a:'Core interface for loading user-specific data during authentication. <code>loadUserByUsername(String username)</code> returns a <code>UserDetails</code> object. Implement it to load users from your database.'},
-  {id:'sec',q:'What is PasswordEncoder?',a:'Hashes passwords before storing and verifies raw passwords against hashes. <code>BCryptPasswordEncoder</code> is recommended — uses bcrypt with random salt and configurable work factor. Use <code>DelegatingPasswordEncoder</code> for migration. Never store plain-text passwords.'},
-  {id:'sec',q:'@PreAuthorize and @PostAuthorize?',a:'<code>@PreAuthorize</code> checks a SpEL expression before method execution: <code>@PreAuthorize("hasRole(\'ADMIN\')")</code>. <code>@PostAuthorize</code> checks after and can reference <code>returnObject</code>. Enable with <code>@EnableMethodSecurity</code>.'},
-  {id:'sec',q:'What is CSRF and how does Spring handle it?',a:'CSRF tricks users into submitting unwanted requests. Spring Security uses a synchronizer token pattern for state-changing methods. For stateless REST APIs (JWT-based), CSRF is typically disabled since no session is used.'},
-  {id:'sec',q:'What is OAuth2 in Spring Security?',a:'Full OAuth2 support as resource server (validates JWT/opaque tokens) or client (manages obtaining/refreshing tokens). <code>spring-boot-starter-oauth2-resource-server</code> with <code>spring.security.oauth2.resourceserver.jwt.issuer-uri</code> sets up JWT validation automatically.'},
-  {id:'sec',q:'What is SecurityContextHolder?',a:'Stores the <code>SecurityContext</code> for the current thread (default: <code>ThreadLocal</code> strategy). Access via <code>SecurityContextHolder.getContext().getAuthentication()</code>. Cleared after each request in the filter chain.'},
-  {id:'sec',q:'hasRole() vs hasAuthority()?',a:'<code>hasRole("ADMIN")</code> auto-prepends <code>ROLE_</code> — checks for <code>ROLE_ADMIN</code>. <code>hasAuthority("ROLE_ADMIN")</code> checks the exact string. For fine-grained permissions like <code>READ_PRIVILEGE</code>, use <code>hasAuthority</code>.'},
-  {id:'sec',q:'What is JWT validation in Spring Security?',a:'<code>JwtDecoder</code> fetches the issuer\'s JWK Set and validates the token\'s signature, expiry, and claims on every request. Configured automatically with <code>spring.security.oauth2.resourceserver.jwt.issuer-uri</code>.'},
+ {
+    id: 'sec',
+    q: 'What is Spring Security?',
+    a: `
+<h3>📖 Definition</h3>
 
+<p>
+<strong>Spring Security</strong> is a powerful security framework that protects Spring applications by providing authentication, authorization, and protection against common security attacks.
+</p>
+
+<p>
+It intercepts every incoming HTTP request before it reaches your Controller and decides whether the request should be allowed or denied.
+</p>
+
+<h3>🤔 Why do we need Spring Security?</h3>
+
+<ul>
+<li>Authenticate users.</li>
+<li>Control access to APIs and resources.</li>
+<li>Protect passwords using hashing.</li>
+<li>Prevent common attacks like CSRF.</li>
+<li>Support JWT, OAuth2, LDAP, and many authentication mechanisms.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>A client sends an HTTP request.</li>
+<li>The request first enters the Spring Security Filter Chain.</li>
+<li>Security filters authenticate the user.</li>
+<li>If authentication succeeds, authorization checks are performed.</li>
+<li>If the user has permission, the request reaches the Controller.</li>
+<li>Otherwise, Spring returns 401 (Unauthorized) or 403 (Forbidden).</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    SecurityFilterChain securityFilterChain(
+            HttpSecurity http) throws Exception {
+
+        http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/admin/**")
+                .hasRole("ADMIN")
+                .anyRequest()
+                .authenticated()
+            )
+            .formLogin();
+
+        return http.build();
+
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Protects Spring applications.</li>
+<li>Handles Authentication and Authorization.</li>
+<li>Works using a Filter Chain.</li>
+<li>Supports JWT, OAuth2, LDAP, Basic Auth, and Form Login.</li>
+</ul>
+`
+},
+
+{
+    id: 'sec',
+    q: "How does Spring Security's Filter Chain work?",
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Spring Security processes every HTTP request through a series of security filters called the <strong>Security Filter Chain</strong>. Each filter performs a specific task such as authentication, authorization, session management, or CSRF protection.
+</p>
+
+<p>
+Instead of Controllers handling security, these filters process the request before it reaches your application.
+</p>
+
+<h3>🤔 Why do we need the Filter Chain?</h3>
+
+<ul>
+<li>Authenticate users.</li>
+<li>Validate JWT tokens.</li>
+<li>Check user permissions.</li>
+<li>Protect against security attacks.</li>
+<li>Keep security separate from business logic.</li>
+</ul>
+
+<h3>⚙️ Request Flow</h3>
+
+<pre><code>
+Client
+   │
+   ▼
+DelegatingFilterProxy
+   │
+   ▼
+FilterChainProxy
+   │
+   ▼
+SecurityFilterChain
+   │
+   ├── Authentication Filter
+   ├── JWT Filter
+   ├── Authorization Filter
+   └── Other Security Filters
+   │
+   ▼
+Controller
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Bean
+SecurityFilterChain securityFilterChain(
+        HttpSecurity http) throws Exception {
+
+    http
+        .authorizeHttpRequests(auth -> auth
+            .anyRequest().authenticated()
+        );
+
+    return http.build();
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Every request passes through the Filter Chain.</li>
+<li>Filters execute in a specific order.</li>
+<li>Security checks happen before the Controller is called.</li>
+<li>Custom filters (such as JWT filters) can be added.</li>
+</ul>
+`
+},
+
+{
+    id: 'sec',
+    q: 'Authentication vs Authorization',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Authentication and Authorization are two different security concepts.
+</p>
+
+<ul>
+<li><strong>Authentication</strong> verifies <strong>who the user is</strong>.</li>
+<li><strong>Authorization</strong> determines <strong>what the authenticated user is allowed to do</strong>.</li>
+</ul>
+
+<h3>🤔 Why are both required?</h3>
+
+<ul>
+<li>Authentication identifies the user.</li>
+<li>Authorization controls access to resources.</li>
+<li>Together they secure the application.</li>
+</ul>
+
+<h3>⚙️ Authentication Flow</h3>
+
+<pre><code>
+User
+   │
+Username & Password
+   │
+   ▼
+Authentication
+   │
+Valid?
+   │
+   ▼
+SecurityContext
+   │
+   ▼
+Authorization Check
+   │
+   ▼
+Controller
+</code></pre>
+
+<h3>⚙️ Comparison</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Authentication</th>
+<th>Authorization</th>
+</tr>
+
+<tr>
+<td>Verifies identity.</td>
+<td>Verifies permissions.</td>
+</tr>
+
+<tr>
+<td>Happens first.</td>
+<td>Happens after authentication.</td>
+</tr>
+
+<tr>
+<td>Checks username/password or JWT.</td>
+<td>Checks roles and authorities.</td>
+</tr>
+
+<tr>
+<td>Returns an authenticated user.</td>
+<td>Determines whether access is allowed.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>http
+.authorizeHttpRequests(auth -> auth
+
+    .requestMatchers("/admin/**")
+    .hasRole("ADMIN")
+
+    .requestMatchers("/user/**")
+    .authenticated()
+
+);
+</code></pre>
+
+<p>
+The user must first be authenticated. Then Spring checks whether the user has the required role before allowing access.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Authentication = Who are you?</li>
+<li>Authorization = What can you access?</li>
+<li>Authentication always happens before Authorization.</li>
+<li>The authenticated user is stored in the SecurityContext.</li>
+</ul>
+`
+},
+{
+    id: 'sec',
+    q: 'What is UserDetailsService?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>UserDetailsService</code> is a core interface in Spring Security used to load user information during authentication. When a user tries to log in, Spring Security calls this interface to retrieve the user's details from a database, LDAP, or any other data source.
+</p>
+
+<p>
+It contains a single method:</p>
+
+<pre><code>UserDetails loadUserByUsername(String username)
+</code></pre>
+
+<h3>🤔 Why do we need UserDetailsService?</h3>
+
+<ul>
+<li>Load user information from the database.</li>
+<li>Verify whether the user exists.</li>
+<li>Provide user roles and authorities.</li>
+<li>Integrate custom user tables with Spring Security.</li>
+</ul>
+
+<h3>⚙️ Authentication Flow</h3>
+
+<pre><code>
+User Login
+     │
+Username & Password
+     │
+     ▼
+UserDetailsService
+     │
+     ▼
+Database
+     │
+     ▼
+UserDetails
+     │
+     ▼
+Password Verification
+     │
+     ▼
+Authentication Success
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Service
+public class CustomUserDetailsService
+        implements UserDetailsService {
+
+    private final UserRepository repository;
+
+    public CustomUserDetailsService(
+            UserRepository repository) {
+        this.repository = repository;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(
+            String username) {
+
+        User user = repository.findByUsername(username)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User Not Found"));
+
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getUsername())
+                .password(user.getPassword())
+                .roles(user.getRole().name())
+                .build();
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Loads user details during authentication.</li>
+<li>Usually fetches users from a database.</li>
+<li>Returns a <code>UserDetails</code> object.</li>
+<li>Throws <code>UsernameNotFoundException</code> if the user does not exist.</li>
+</ul>
+`
+},
+
+{
+    id: 'sec',
+    q: 'What is PasswordEncoder?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>PasswordEncoder</code> is used to securely hash passwords before storing them in the database and to verify passwords during login.
+</p>
+
+<p>
+Instead of storing plain text passwords, Spring Security stores encrypted hashes. During login, the entered password is hashed and compared with the stored hash.
+</p>
+
+<h3>🤔 Why do we need PasswordEncoder?</h3>
+
+<ul>
+<li>Protect user passwords.</li>
+<li>Prevent password theft from database leaks.</li>
+<li>Secure authentication.</li>
+<li>Follow security best practices.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<pre><code>
+User Password
+      │
+      ▼
+PasswordEncoder
+      │
+      ▼
+Encrypted Hash
+      │
+      ▼
+Database
+</code></pre>
+
+<p><strong>During Login</strong></p>
+
+<pre><code>
+Entered Password
+       │
+       ▼
+PasswordEncoder.matches()
+       │
+       ▼
+Compare with Stored Hash
+       │
+       ▼
+Authentication Success
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Create Bean</strong></p>
+
+<pre><code>@Bean
+public PasswordEncoder passwordEncoder() {
+
+    return new BCryptPasswordEncoder();
+
+}
+</code></pre>
+
+<p><strong>Encode Password</strong></p>
+
+<pre><code>String encodedPassword =
+        passwordEncoder.encode("admin123");
+</code></pre>
+
+<p><strong>Verify Password</strong></p>
+
+<pre><code>passwordEncoder.matches(
+        "admin123",
+        encodedPassword
+);
+</code></pre>
+
+<h3>⭐ Common Password Encoders</h3>
+
+<ul>
+<li><code>BCryptPasswordEncoder</code> (Recommended)</li>
+<li><code>Pbkdf2PasswordEncoder</code></li>
+<li><code>SCryptPasswordEncoder</code></li>
+<li><code>Argon2PasswordEncoder</code></li>
+</ul>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Never store plain text passwords.</li>
+<li>BCrypt is the most commonly used PasswordEncoder.</li>
+<li>Use <code>encode()</code> to hash passwords.</li>
+<li>Use <code>matches()</code> to verify passwords.</li>
+</ul>
+`
+},
+
+{
+    id: 'sec',
+    q: '@PreAuthorize vs @PostAuthorize',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Both <code>@PreAuthorize</code> and <code>@PostAuthorize</code> provide method-level security using Spring Expression Language (SpEL).
+</p>
+
+<ul>
+<li><code>@PreAuthorize</code> checks permissions <strong>before</strong> a method executes.</li>
+<li><code>@PostAuthorize</code> checks permissions <strong>after</strong> a method finishes executing.</li>
+</ul>
+
+<h3>🤔 Why do we need Method Security?</h3>
+
+<ul>
+<li>Secure individual service methods.</li>
+<li>Restrict access based on roles or authorities.</li>
+<li>Protect business logic.</li>
+<li>Provide fine-grained access control.</li>
+</ul>
+
+<h3>⚙️ Comparison</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>@PreAuthorize</th>
+<th>@PostAuthorize</th>
+</tr>
+
+<tr>
+<td>Executes before the method.</td>
+<td>Executes after the method.</td>
+</tr>
+
+<tr>
+<td>Blocks unauthorized users immediately.</td>
+<td>Can inspect the returned object.</td>
+</tr>
+
+<tr>
+<td>Most commonly used.</td>
+<td>Used when authorization depends on the returned data.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>@PreAuthorize</strong></p>
+
+<pre><code>@PreAuthorize("hasRole('ADMIN')")
+@GetMapping("/users")
+public List&lt;User&gt; getUsers() {
+
+    return service.findAll();
+
+}
+</code></pre>
+
+<p><strong>@PostAuthorize</strong></p>
+
+<pre><code>@PostAuthorize("returnObject.owner == authentication.name")
+@GetMapping("/{id}")
+public Product getProduct(
+        @PathVariable Long id) {
+
+    return service.findById(id);
+
+}
+</code></pre>
+
+<p><strong>Enable Method Security</strong></p>
+
+<pre><code>@Configuration
+@EnableMethodSecurity
+public class SecurityConfig {
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li><code>@PreAuthorize</code> checks access before execution.</li>
+<li><code>@PostAuthorize</code> checks access after execution.</li>
+<li>Both use Spring Expression Language (SpEL).</li>
+<li><code>@PreAuthorize</code> is used much more frequently.</li>
+</ul>
+`
+},
+{
+    id: 'sec',
+    q: 'What is CSRF and how does Spring Security handle it?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<strong>CSRF (Cross-Site Request Forgery)</strong> is a security attack where a malicious website tricks an authenticated user into sending unwanted requests to another website without their knowledge.
+</p>
+
+<p>
+Since the browser automatically sends cookies with every request, the server may think the request is coming from the legitimate user.
+</p>
+
+<h3>🤔 Why is CSRF dangerous?</h3>
+
+<ul>
+<li>Can perform unwanted actions on behalf of a logged-in user.</li>
+<li>May transfer money, change passwords, or delete data.</li>
+<li>Occurs mainly in session or cookie-based authentication.</li>
+</ul>
+
+<h3>⚙️ How Spring Security prevents CSRF</h3>
+
+<ol>
+<li>User logs into the application.</li>
+<li>Spring generates a unique CSRF token.</li>
+<li>The token is sent to the browser.</li>
+<li>Every state-changing request (POST, PUT, DELETE, PATCH) must include this token.</li>
+<li>If the token is missing or invalid, Spring rejects the request with HTTP 403.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Disable CSRF (Common for JWT APIs)</strong></p>
+
+<pre><code>@Bean
+SecurityFilterChain securityFilterChain(
+        HttpSecurity http) throws Exception {
+
+    http
+        .csrf(csrf -> csrf.disable());
+
+    return http.build();
+
+}
+</code></pre>
+
+<p><strong>Enable CSRF (Default)</strong></p>
+
+<pre><code>http
+    .csrf(Customizer.withDefaults());
+</code></pre>
+
+<h3>⭐ When should CSRF be disabled?</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Application Type</th>
+<th>CSRF</th>
+</tr>
+
+<tr>
+<td>Traditional Web Application (Session Based)</td>
+<td>Keep Enabled ✅</td>
+</tr>
+
+<tr>
+<td>REST API using JWT</td>
+<td>Usually Disabled ✅</td>
+</tr>
+
+<tr>
+<td>REST API using Sessions</td>
+<td>Keep Enabled ✅</td>
+</tr>
+
+</table>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>CSRF targets authenticated users.</li>
+<li>Spring Security enables CSRF protection by default.</li>
+<li>JWT-based stateless APIs usually disable CSRF.</li>
+<li>Missing or invalid CSRF tokens result in HTTP 403.</li>
+</ul>
+`
+},
+
+{
+    id: 'sec',
+    q: 'What is OAuth2 in Spring Security?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<strong>OAuth 2.0</strong> is an authorization framework that allows applications to access protected resources on behalf of a user without sharing the user's password.
+</p>
+
+<p>
+Spring Security provides built-in support for OAuth2 Clients, Authorization Servers, and Resource Servers.
+</p>
+
+<h3>🤔 Why do we need OAuth2?</h3>
+
+<ul>
+<li>Enable Single Sign-On (SSO).</li>
+<li>Allow login using Google, GitHub, Microsoft, etc.</li>
+<li>Secure REST APIs using access tokens.</li>
+<li>Avoid sharing user passwords with third-party applications.</li>
+</ul>
+
+<h3>⚙️ OAuth2 Flow</h3>
+
+<pre><code>
+User
+   │
+   ▼
+Client Application
+   │
+   ▼
+Authorization Server
+   │
+Access Token
+   │
+   ▼
+Resource Server (Spring Boot API)
+   │
+   ▼
+Protected Resources
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Dependency</strong></p>
+
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-oauth2-resource-server&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<p><strong>application.properties</strong></p>
+
+<pre><code>spring.security.oauth2.resourceserver.jwt.issuer-uri=
+https://accounts.google.com
+</code></pre>
+
+<p><strong>Security Configuration</strong></p>
+
+<pre><code>http
+    .oauth2ResourceServer(oauth2 ->
+        oauth2.jwt());
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>OAuth2 is an authorization framework.</li>
+<li>Uses Access Tokens instead of passwords.</li>
+<li>Supports Google, GitHub, Microsoft login.</li>
+<li>Spring Boot provides built-in OAuth2 support.</li>
+</ul>
+`
+},
+
+{
+    id: 'sec',
+    q: 'What is SecurityContextHolder?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>SecurityContextHolder</code> is a Spring Security class that stores the currently authenticated user's security information during a request.
+</p>
+
+<p>
+It contains a <code>SecurityContext</code>, which in turn contains an <code>Authentication</code> object representing the logged-in user.
+</p>
+
+<h3>🤔 Why do we need SecurityContextHolder?</h3>
+
+<ul>
+<li>Access the currently logged-in user.</li>
+<li>Read user roles and authorities.</li>
+<li>Check authentication status anywhere in the application.</li>
+<li>Perform role-based business logic.</li>
+</ul>
+
+<h3>⚙️ Structure</h3>
+
+<pre><code>
+SecurityContextHolder
+        │
+        ▼
+SecurityContext
+        │
+        ▼
+Authentication
+        │
+        ├── Principal (User)
+        ├── Credentials
+        └── Authorities
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>Authentication authentication =
+        SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+String username =
+        authentication.getName();
+
+Collection&lt;? extends GrantedAuthority&gt;
+authorities =
+        authentication.getAuthorities();
+</code></pre>
+
+<p>
+This retrieves the currently authenticated user's username and roles.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Stores security information for the current request.</li>
+<li>Contains the Authentication object.</li>
+<li>Provides access to the logged-in user.</li>
+<li>Automatically cleared after the request completes.</li>
+</ul>
+`
+},
+{
+    id: 'sec',
+    q: 'hasRole() vs hasAuthority()',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Both <code>hasRole()</code> and <code>hasAuthority()</code> are Spring Security methods used to restrict access to resources. They check whether the authenticated user has the required permission before allowing access.
+</p>
+
+<p>
+The main difference is that <code>hasRole()</code> automatically adds the prefix <code>ROLE_</code>, while <code>hasAuthority()</code> checks the exact authority name.
+</p>
+
+<h3>🤔 Why do we need them?</h3>
+
+<ul>
+<li>Restrict access to APIs.</li>
+<li>Implement Role-Based Access Control (RBAC).</li>
+<li>Protect sensitive operations.</li>
+<li>Allow fine-grained permissions.</li>
+</ul>
+
+<h3>⚙️ Comparison</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>hasRole()</th>
+<th>hasAuthority()</th>
+</tr>
+
+<tr>
+<td>Checks roles.</td>
+<td>Checks exact authority.</td>
+</tr>
+
+<tr>
+<td>Automatically adds <code>ROLE_</code>.</td>
+<td>No prefix is added.</td>
+</tr>
+
+<tr>
+<td><code>hasRole("ADMIN")</code> → checks <code>ROLE_ADMIN</code>.</td>
+<td><code>hasAuthority("ROLE_ADMIN")</code> → checks exactly <code>ROLE_ADMIN</code>.</td>
+</tr>
+
+<tr>
+<td>Best for role-based security.</td>
+<td>Best for permission-based security.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Using hasRole()</strong></p>
+
+<pre><code>@PreAuthorize("hasRole('ADMIN')")
+public void deleteProduct() {
+
+}
+</code></pre>
+
+<p>Spring checks whether the user has the authority <code>ROLE_ADMIN</code>.</p>
+
+<p><strong>Using hasAuthority()</strong></p>
+
+<pre><code>@PreAuthorize("hasAuthority('PRODUCT_DELETE')")
+public void deleteProduct() {
+
+}
+</code></pre>
+
+<p>The user must have the exact authority <code>PRODUCT_DELETE</code>.</p>
+
+<h3>⭐ When to use?</h3>
+
+<ul>
+<li>Use <code>hasRole()</code> for roles like ADMIN, USER, MANAGER.</li>
+<li>Use <code>hasAuthority()</code> for permissions like READ_PRODUCT, CREATE_PRODUCT, DELETE_PRODUCT.</li>
+</ul>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li><code>hasRole()</code> automatically prefixes <code>ROLE_</code>.</li>
+<li><code>hasAuthority()</code> checks the exact authority name.</li>
+<li>Roles are usually broad permissions.</li>
+<li>Authorities provide fine-grained access control.</li>
+</ul>
+`
+},
+
+{
+    id: 'sec',
+    q: 'What is JWT Validation in Spring Security?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+JWT (JSON Web Token) Validation is the process of verifying that a JWT received from the client is valid before allowing access to protected resources.
+</p>
+
+<p>
+During validation, Spring Security checks the token's signature, expiration time, issuer, audience, and other claims. If the token is valid, the user is authenticated; otherwise, access is denied.
+</p>
+
+<h3>🤔 Why do we need JWT Validation?</h3>
+
+<ul>
+<li>Verify the authenticity of the token.</li>
+<li>Prevent tampered or fake tokens.</li>
+<li>Reject expired tokens.</li>
+<li>Authenticate users without server-side sessions.</li>
+</ul>
+
+<h3>⚙️ Validation Flow</h3>
+
+<pre><code>
+Client
+   │
+JWT Token
+   │
+   ▼
+Security Filter
+   │
+   ▼
+JwtDecoder
+   │
+   ├── Verify Signature
+   ├── Check Expiration
+   ├── Validate Issuer
+   ├── Validate Claims
+   │
+   ▼
+Authentication Created
+   │
+   ▼
+SecurityContextHolder
+   │
+   ▼
+Controller
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>application.properties</strong></p>
+
+<pre><code>spring.security.oauth2.resourceserver.jwt.issuer-uri=
+https://accounts.google.com
+</code></pre>
+
+<p><strong>Security Configuration</strong></p>
+
+<pre><code>@Bean
+SecurityFilterChain securityFilterChain(
+        HttpSecurity http) throws Exception {
+
+    http
+        .oauth2ResourceServer(oauth2 ->
+            oauth2.jwt());
+
+    return http.build();
+
+}
+</code></pre>
+
+<p>
+Spring automatically creates a <code>JwtDecoder</code> that validates every incoming JWT before the request reaches the Controller.
+</p>
+
+<h3>⭐ What does Spring validate?</h3>
+
+<ul>
+<li>Digital Signature</li>
+<li>Expiration Time (<code>exp</code>)</li>
+<li>Issuer (<code>iss</code>)</li>
+<li>Audience (if configured)</li>
+<li>Other JWT Claims</li>
+</ul>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>JWT is validated on every protected request.</li>
+<li>Uses <code>JwtDecoder</code> internally.</li>
+<li>Invalid or expired tokens return HTTP 401 Unauthorized.</li>
+<li>No server-side session is required for JWT authentication.</li>
+</ul>
+`
+},
   {id:'aop',q:'What is AOP (Aspect-Oriented Programming)?',a:'AOP separates cross-cutting concerns (logging, security, transactions, caching) from business logic. Spring AOP uses JDK dynamic proxies (for interfaces) or CGLIB proxies (for classes) to weave advice into execution flow.'},
   {id:'aop',q:'What are the key AOP terms?',a:'<strong>Aspect</strong> — the cross-cutting concern module. <strong>Advice</strong> — action to take. <strong>Pointcut</strong> — where to apply. <strong>JoinPoint</strong> — point during execution. <strong>Weaving</strong> — linking aspects with objects. <strong>Target object</strong> — the bean being advised.'},
   {id:'aop',q:'Types of advice in Spring AOP?',a:'<code>@Before</code> (before method), <code>@AfterReturning</code> (after successful return), <code>@AfterThrowing</code> (after exception), <code>@After</code> (always, like finally), <code>@Around</code> (surrounds method — most powerful, must call <code>proceed()</code>).'},
