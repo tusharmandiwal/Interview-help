@@ -2064,42 +2064,2854 @@ Spring overrides the <code>getTask()</code> method at runtime and returns a new 
 </ul>
 `
 },
-  {id:'boot',q:'What is Spring Boot?',a:'Spring Boot is an opinionated extension of Spring that provides auto-configuration, embedded servers (Tomcat/Jetty/Undertow), starter dependencies, Actuator, and eliminates boilerplate XML/Java config. Run anywhere with <code>java -jar</code>.'},
-  {id:'boot',q:'What is Spring Boot auto-configuration?',a:'Auto-configuration automatically configures beans based on classpath JARs and your own config. Enabled by <code>@EnableAutoConfiguration</code> (included in <code>@SpringBootApplication</code>). Spring Boot reads <code>AutoConfiguration.imports</code> and applies classes conditionally.'},
-  {id:'boot',q:'What does @SpringBootApplication do?',a:'It combines three annotations: <code>@Configuration</code> (marks as config source), <code>@EnableAutoConfiguration</code> (enables auto-config), and <code>@ComponentScan</code> (component scanning from the annotated class\'s package).'},
-  {id:'boot',q:'What are Spring Boot starters?',a:'Starters are dependency descriptors bundling everything needed for a feature. <code>spring-boot-starter-web</code> includes Spring MVC, Jackson, and embedded Tomcat. They simplify Maven/Gradle config by grouping transitive dependencies.'},
-  {id:'boot',q:'application.properties vs application.yml?',a:'Both configure Spring Boot. <code>application.properties</code> uses flat key=value pairs. <code>application.yml</code> uses YAML\'s hierarchical structure — more readable for nested configs. Both support profiles (e.g., <code>application-dev.yml</code>).'},
-  {id:'boot',q:'What is Spring Boot Actuator?',a:'Actuator exposes production-ready operational information via HTTP/JMX endpoints: <code>/actuator/health</code>, <code>/actuator/metrics</code>, <code>/actuator/env</code>, <code>/actuator/beans</code>. Endpoints must be explicitly exposed in config.'},
-  {id:'boot',q:'What are Spring Boot profiles?',a:'Profiles define environment-specific configuration (dev, test, prod). Activate with <code>spring.profiles.active=dev</code>. Profile-specific files like <code>application-dev.yml</code> are auto-picked. Beans can use <code>@Profile("dev")</code> to load conditionally.'},
-  {id:'boot',q:'What is @ConfigurationProperties?',a:'Binds a group of properties to a typed POJO. <code>@ConfigurationProperties(prefix="app")</code> on a class with a <code>name</code> field binds <code>app.name</code>. Supports <code>@Validated</code>. More type-safe than <code>@Value</code> for related properties.'},
-  {id:'boot',q:"How does Spring Boot's embedded server work?",a:'Spring Boot packages an embedded Tomcat (or Jetty/Undertow) inside the fat JAR. Running <code>java -jar app.jar</code> starts the container programmatically during context initialization — no external server deployment needed.'},
-  {id:'boot',q:'CommandLineRunner vs ApplicationRunner?',a:'Both run code after the Spring context is fully loaded. <code>CommandLineRunner.run(String... args)</code> receives raw args. <code>ApplicationRunner.run(ApplicationArguments args)</code> receives parsed args. Useful for data initialization or startup checks.'},
-  {id:'boot',q:'What is Spring Boot DevTools?',a:'DevTools provides auto-restart on classpath changes, LiveReload integration (refreshes browser), and dev-optimized defaults (e.g., no template caching). Automatically excluded from production builds.'},
+{
+    id: 'boot',
+    q: 'What is Spring Boot?',
+    a: `
+<h3>📖 Definition</h3>
 
-  {id:'mvc',q:'What is Spring MVC?',a:'Spring MVC is a web framework built on the Servlet API following the MVC pattern. <code>DispatcherServlet</code> acts as the front controller, routing requests to <code>@Controller</code> methods, resolving views, and handling the full request-response lifecycle.'},
-  {id:'mvc',q:'What is DispatcherServlet?',a:'<code>DispatcherServlet</code> is the front controller. It receives all HTTP requests, consults <code>HandlerMapping</code> to find the right controller, delegates to it, then uses <code>ViewResolver</code> to render the response.'},
-  {id:'mvc',q:'@Controller vs @RestController?',a:'<code>@Controller</code> returns view names by default. <code>@RestController</code> = <code>@Controller</code> + <code>@ResponseBody</code> — every method serializes the return value directly to the HTTP response body (JSON/XML), not a view.'},
-  {id:'mvc',q:'@RequestMapping and HTTP method shortcuts?',a:'<code>@RequestMapping</code> maps requests specifying URL, method, params, headers. <code>@GetMapping</code>, <code>@PostMapping</code>, <code>@PutMapping</code>, <code>@DeleteMapping</code>, <code>@PatchMapping</code> are composed shortcuts.'},
-  {id:'mvc',q:'@PathVariable vs @RequestParam?',a:'<code>@PathVariable</code> extracts values from URI templates (<code>/users/{id}</code>). <code>@RequestParam</code> extracts query string params (<code>/users?page=1</code>). <code>@RequestParam</code> can be optional with a default value.'},
-  {id:'mvc',q:'@RequestBody and @ResponseBody?',a:'<code>@RequestBody</code> deserializes the HTTP request body into a Java object via <code>HttpMessageConverter</code>. <code>@ResponseBody</code> serializes the return value to the response body. Implicit on all methods with <code>@RestController</code>.'},
-  {id:'mvc',q:'What is ResponseEntity?',a:'<code>ResponseEntity&lt;T&gt;</code> represents the full HTTP response — status code, headers, and body. Gives fine-grained control: <code>return ResponseEntity.status(HttpStatus.CREATED).header("Location", uri).body(obj)</code>.'},
-  {id:'mvc',q:'@ExceptionHandler and @ControllerAdvice?',a:'<code>@ExceptionHandler</code> handles exceptions in a specific controller. <code>@ControllerAdvice</code> (or <code>@RestControllerAdvice</code>) applies globally across all controllers — centralized error handling.'},
-  {id:'mvc',q:'What is HandlerInterceptor?',a:'Similar to a servlet filter but tied to Spring MVC. Has <code>preHandle</code> (before handler), <code>postHandle</code> (after handler, before view render), and <code>afterCompletion</code> (always, like finally). Useful for logging, auth checks, locale setup.'},
-  {id:'mvc',q:'What is content negotiation?',a:'Determines response format from the <code>Accept</code> header, URL extension, or request parameter. Spring MVC uses <code>ContentNegotiationManager</code> to select the appropriate <code>HttpMessageConverter</code> — JSON or XML based on client preference.'},
-  {id:'mvc',q:'What is CORS and how to configure it?',a:'CORS allows controlled cross-origin requests. Configure per-controller with <code>@CrossOrigin</code>, or globally via <code>WebMvcConfigurer.addCorsMappings()</code>. Set allowed origins, methods, headers, and whether credentials are allowed.'},
+<p>
+<strong>Spring Boot</strong> is a framework built on top of the Spring Framework that makes developing Spring applications faster and easier. It provides automatic configuration, starter dependencies, an embedded server, and production-ready features with minimal configuration.
+</p>
 
-  {id:'data',q:'What is Spring Data JPA?',a:'Spring Data JPA simplifies JPA data access by auto-generating repository implementations, supporting derived query methods, pagination, sorting, and <code>@Query</code> for custom JPQL/native SQL. Sits on top of providers like Hibernate.'},
-  {id:'data',q:'What is the Repository hierarchy?',a:'<code>Repository</code> (marker) → <code>CrudRepository</code> (basic CRUD) → <code>PagingAndSortingRepository</code> (paging/sorting) → <code>JpaRepository</code> (JPA-specific: <code>flush()</code>, <code>saveAndFlush()</code>, batch deletion). Most repos extend <code>JpaRepository</code>.'},
-  {id:'data',q:'What are derived query methods?',a:'Spring Data generates queries from method names. <code>findByEmailAndAge(String email, int age)</code> generates the JPQL automatically. Keywords: <code>findBy</code>, <code>countBy</code>, <code>deleteBy</code>, <code>And</code>, <code>Or</code>, <code>Between</code>, <code>Like</code>, <code>OrderBy</code>, <code>IgnoreCase</code>, etc.'},
-  {id:'data',q:'What is @Query in Spring Data?',a:'Defines custom JPQL or native SQL on a repository method. JPQL: <code>@Query("SELECT u FROM User u WHERE u.email = ?1")</code>. Native: <code>@Query(value="SELECT * FROM users WHERE email=?", nativeQuery=true)</code>. Supports named params with <code>:paramName</code>.'},
-  {id:'data',q:'save() vs saveAndFlush()?',a:'<code>save()</code> may batch the SQL — not immediately sent to the DB. <code>saveAndFlush()</code> immediately flushes the persistence context, sending SQL to the DB in the current transaction. Useful when subsequent operations in the same transaction need the DB state updated.'},
-  {id:'data',q:'What is Pageable and Page?',a:'<code>Pageable</code> encapsulates page number, size, and sorting. Repository methods return <code>Page&lt;T&gt;</code> with content, total elements, total pages, and navigation info. Example: <code>PageRequest.of(0, 10, Sort.by("name"))</code>.'},
-  {id:'data',q:'What is the N+1 problem?',a:'Loading N entities triggers N additional queries for each entity\'s lazy association. Fix with <code>@EntityGraph</code> to specify eager loading per query, <code>JOIN FETCH</code> in <code>@Query</code>, or appropriate fetch type configuration globally.'},
-  {id:'data',q:'What is @Modifying?',a:'Required with <code>@Query</code> for UPDATE/DELETE statements. Tells Spring Data the query modifies data. Also requires <code>@Transactional</code>. May need <code>clearAutomatically=true</code> to sync the persistence context after the modification.'},
-  {id:'data',q:'What is @Entity and @Table?',a:'<code>@Entity</code> marks a JPA persistent class. <code>@Table(name="users")</code> specifies the table name. The entity needs a no-arg constructor and an <code>@Id</code> field. <code>@Column</code> customizes column mappings (name, nullable, length, unique).'},
-  {id:'data',q:"What are Spring Data's auditing features?",a:'<code>@CreatedDate</code>, <code>@LastModifiedDate</code>, <code>@CreatedBy</code>, <code>@LastModifiedBy</code> auto-populate audit fields. Enable with <code>@EnableJpaAuditing</code>. Provide <code>AuditorAware</code> for current user. Entity needs <code>@EntityListeners(AuditingEntityListener.class)</code>.'},
-  {id:'data',q:'JPQL vs native SQL in Spring Data?',a:'JPQL operates on entity objects — database-independent. Native SQL operates on DB tables — DB-specific but can use DB functions. Use <code>@Query</code> with <code>nativeQuery=true</code> for native SQL. May need <code>@SqlResultSetMapping</code> for complex mappings.'},
+<p>
+Instead of configuring everything manually, Spring Boot follows the <strong>"Convention over Configuration"</strong> approach, where sensible default configurations are applied automatically.
+</p>
 
+<h3>🤔 Why do we need Spring Boot?</h3>
+
+<ul>
+<li>Reduces configuration and boilerplate code.</li>
+<li>Provides starter dependencies for common features.</li>
+<li>Automatically configures the application.</li>
+<li>Includes an embedded web server.</li>
+<li>Creates standalone applications that can run using <code>java -jar</code>.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>The application starts from the main class.</li>
+<li>Spring Boot scans the project for components.</li>
+<li>Auto Configuration configures required Beans.</li>
+<li>The embedded server (Tomcat by default) starts automatically.</li>
+<li>The application becomes ready to handle requests.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@SpringBootApplication
+public class InventoryApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(InventoryApplication.class, args);
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Built on top of Spring Framework.</li>
+<li>Uses Auto Configuration.</li>
+<li>Provides Starter Dependencies.</li>
+<li>Includes an Embedded Server.</li>
+<li>Creates standalone executable applications.</li>
+</ul>
+`
+},
+
+{
+    id: 'boot',
+    q: 'What is Spring Boot Auto Configuration?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<strong>Auto Configuration</strong> is a feature that automatically configures Spring Beans based on the dependencies available in your project and the application configuration.
+</p>
+
+<p>
+For example, if Spring Boot detects the MySQL Driver and Spring Data JPA dependency, it automatically creates a <code>DataSource</code> Bean without requiring manual configuration.
+</p>
+
+<h3>🤔 Why do we need Auto Configuration?</h3>
+
+<ul>
+<li>Reduces manual configuration.</li>
+<li>Saves development time.</li>
+<li>Automatically creates commonly used Beans.</li>
+<li>Provides sensible default configurations.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>Application starts.</li>
+<li>Spring Boot checks the project dependencies.</li>
+<li>It evaluates different <code>@Conditional</code> annotations.</li>
+<li>If the required conditions are satisfied, the corresponding Beans are created automatically.</li>
+<li>If you define your own Bean, Spring Boot backs off and uses your configuration.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>// pom.xml
+
+spring-boot-starter-data-jpa
+mysql-connector-j
+
+// application.properties
+
+spring.datasource.url=jdbc:mysql://localhost:3306/demo
+spring.datasource.username=root
+spring.datasource.password=root
+</code></pre>
+
+<p>
+Spring Boot automatically creates the <code>DataSource</code>, <code>EntityManager</code>, and other required JPA Beans.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Enabled by <code>@SpringBootApplication</code>.</li>
+<li>Uses <code>@Conditional</code> annotations internally.</li>
+<li>Reduces configuration significantly.</li>
+<li>Your custom Beans override Auto Configuration.</li>
+</ul>
+`
+},
+
+{
+    id: 'boot',
+    q: 'What does @SpringBootApplication do?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@SpringBootApplication</code> is the main annotation used in every Spring Boot application. It combines three important Spring annotations into a single annotation.
+</p>
+
+<h3>🤔 Why do we need it?</h3>
+
+<ul>
+<li>Reduces multiple annotations into one.</li>
+<li>Starts Auto Configuration.</li>
+<li>Enables Component Scanning.</li>
+<li>Marks the class as a configuration class.</li>
+</ul>
+
+<h3>⚙️ It combines</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Annotation</th>
+<th>Purpose</th>
+</tr>
+
+<tr>
+<td><code>@Configuration</code></td>
+<td>Marks the class as a configuration class.</td>
+</tr>
+
+<tr>
+<td><code>@EnableAutoConfiguration</code></td>
+<td>Enables Spring Boot Auto Configuration.</td>
+</tr>
+
+<tr>
+<td><code>@ComponentScan</code></td>
+<td>Scans the package for Spring Beans.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@SpringBootApplication
+public class Application {
+
+    public static void main(String[] args) {
+
+        SpringApplication.run(Application.class, args);
+
+    }
+
+}
+</code></pre>
+
+<p><strong>Equivalent to:</strong></p>
+
+<pre><code>@Configuration
+@EnableAutoConfiguration
+@ComponentScan
+public class Application {
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Main annotation of every Spring Boot application.</li>
+<li>Combines three important annotations.</li>
+<li>Starts component scanning and auto configuration.</li>
+<li>Usually placed in the root package.</li>
+</ul>
+`
+},
+{
+    id: 'boot',
+    q: 'What are Spring Boot Starters?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Spring Boot Starters are pre-configured dependency packages that include all the libraries required for a specific feature. Instead of adding multiple dependencies manually, you can include a single starter dependency.
+</p>
+
+<p>
+For example, adding <code>spring-boot-starter-web</code> automatically includes Spring MVC, Jackson, Validation, Embedded Tomcat, and other required libraries.
+</p>
+
+<h3>🤔 Why do we need Starters?</h3>
+
+<ul>
+<li>Reduce dependency management.</li>
+<li>Avoid version compatibility issues.</li>
+<li>Speed up project setup.</li>
+<li>Provide tested and compatible libraries.</li>
+</ul>
+
+<h3>⚙️ Common Starters</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Starter</th>
+<th>Purpose</th>
+</tr>
+
+<tr>
+<td><code>spring-boot-starter-web</code></td>
+<td>Build REST APIs and Web Applications.</td>
+</tr>
+
+<tr>
+<td><code>spring-boot-starter-data-jpa</code></td>
+<td>Database access using Spring Data JPA.</td>
+</tr>
+
+<tr>
+<td><code>spring-boot-starter-security</code></td>
+<td>Authentication and Authorization.</td>
+</tr>
+
+<tr>
+<td><code>spring-boot-starter-validation</code></td>
+<td>Bean Validation using Jakarta Validation.</td>
+</tr>
+
+<tr>
+<td><code>spring-boot-starter-test</code></td>
+<td>Testing with JUnit, Mockito, and Spring Test.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<p>
+Adding this single dependency automatically downloads all required web-related libraries.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>One dependency includes multiple related libraries.</li>
+<li>Removes version conflicts.</li>
+<li>Makes project setup much easier.</li>
+<li>Uses Spring Boot's dependency management.</li>
+</ul>
+`
+},
+
+{
+    id: 'boot',
+    q: 'application.properties vs application.yml',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Both <code>application.properties</code> and <code>application.yml</code> are configuration files used to store application settings such as database configuration, server port, logging, and custom properties.
+</p>
+
+<p>
+Both files provide the same functionality. The main difference is their syntax and readability.
+</p>
+
+<h3>🤔 Why do we need Configuration Files?</h3>
+
+<ul>
+<li>Store application settings outside the source code.</li>
+<li>Avoid hardcoding configuration values.</li>
+<li>Support different environments like Dev, Test, and Production.</li>
+<li>Allow configuration changes without modifying Java code.</li>
+</ul>
+
+<h3>⚙️ Comparison</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>application.properties</th>
+<th>application.yml</th>
+</tr>
+
+<tr>
+<td>Key = Value format</td>
+<td>YAML format using indentation</td>
+</tr>
+
+<tr>
+<td>Easy for simple configurations</td>
+<td>Better for nested configurations</td>
+</tr>
+
+<tr>
+<td>More repetitive</td>
+<td>Less repetitive and cleaner</td>
+</tr>
+
+<tr>
+<td>Widely used</td>
+<td>Popular in modern projects</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>application.properties</strong></p>
+
+<pre><code>server.port=8081
+
+spring.datasource.url=jdbc:mysql://localhost:3306/demo
+
+spring.datasource.username=root
+</code></pre>
+
+<p><strong>application.yml</strong></p>
+
+<pre><code>server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/demo
+    username: root
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Both files provide the same functionality.</li>
+<li>Only one should be used in a project.</li>
+<li>YAML is easier for large and nested configurations.</li>
+<li>Properties format is simpler for beginners.</li>
+</ul>
+`
+},
+
+{
+    id: 'boot',
+    q: 'What is Spring Boot Actuator?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Spring Boot Actuator provides production-ready features for monitoring and managing a running Spring Boot application. It exposes various endpoints that provide information about the application's health, metrics, configuration, and environment.
+</p>
+
+<h3>🤔 Why do we need Actuator?</h3>
+
+<ul>
+<li>Monitor application health.</li>
+<li>Check JVM and memory usage.</li>
+<li>View application metrics.</li>
+<li>Troubleshoot production issues.</li>
+<li>Integrate with monitoring tools like Prometheus and Grafana.</li>
+</ul>
+
+<h3>⚙️ Common Endpoints</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Endpoint</th>
+<th>Purpose</th>
+</tr>
+
+<tr>
+<td><code>/actuator/health</code></td>
+<td>Application health status.</td>
+</tr>
+
+<tr>
+<td><code>/actuator/info</code></td>
+<td>Application information.</td>
+</tr>
+
+<tr>
+<td><code>/actuator/metrics</code></td>
+<td>Application metrics.</td>
+</tr>
+
+<tr>
+<td><code>/actuator/env</code></td>
+<td>Configuration properties.</td>
+</tr>
+
+<tr>
+<td><code>/actuator/beans</code></td>
+<td>All Spring Beans.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Add Dependency</strong></p>
+
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<p><strong>Expose Endpoints</strong></p>
+
+<pre><code>management.endpoints.web.exposure.include=*
+</code></pre>
+
+<p><strong>Open in Browser</strong></p>
+
+<pre><code>http://localhost:8080/actuator/health
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Provides monitoring and management features.</li>
+<li>Mainly used in production environments.</li>
+<li>Exposes REST endpoints.</li>
+<li>Can be secured using Spring Security.</li>
+</ul>
+`
+},
+{
+    id: 'boot',
+    q: 'What are Spring Boot Profiles?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Spring Boot <strong>Profiles</strong> allow you to maintain different configurations for different environments such as <strong>Development (dev)</strong>, <strong>Testing (test)</strong>, and <strong>Production (prod)</strong>.
+</p>
+
+<p>
+Instead of changing configuration values manually, you can create separate configuration files for each environment and activate the required profile.
+</p>
+
+<h3>🤔 Why do we need Profiles?</h3>
+
+<ul>
+<li>Different environments require different configurations.</li>
+<li>Keep production credentials separate from development.</li>
+<li>Avoid modifying configuration before deployment.</li>
+<li>Easily switch between environments.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>Create profile-specific configuration files.</li>
+<li>Activate a profile.</li>
+<li>Spring loads the default configuration.</li>
+<li>Then it loads and overrides values from the active profile.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>application.properties</strong></p>
+
+<pre><code>spring.profiles.active=dev
+</code></pre>
+
+<p><strong>application-dev.properties</strong></p>
+
+<pre><code>server.port=8081
+
+spring.datasource.url=jdbc:mysql://localhost:3306/dev_db
+</code></pre>
+
+<p><strong>application-prod.properties</strong></p>
+
+<pre><code>server.port=8080
+
+spring.datasource.url=jdbc:mysql://production-server/prod_db
+</code></pre>
+
+<p><strong>Using @Profile</strong></p>
+
+<pre><code>@Service
+@Profile("dev")
+public class MockEmailService implements EmailService {
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Supports Dev, Test, and Production environments.</li>
+<li>Activated using <code>spring.profiles.active</code>.</li>
+<li>Different profile files can have different configurations.</li>
+<li><code>@Profile</code> can create Beans only for specific environments.</li>
+</ul>
+`
+},
+
+{
+    id: 'boot',
+    q: 'What is @ConfigurationProperties?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@ConfigurationProperties</code> is used to bind a group of related configuration properties from <code>application.properties</code> or <code>application.yml</code> directly to a Java class.
+</p>
+
+<p>
+Unlike <code>@Value</code>, which reads one property at a time, <code>@ConfigurationProperties</code> can bind multiple related properties together.
+</p>
+
+<h3>🤔 Why do we need @ConfigurationProperties?</h3>
+
+<ul>
+<li>Read multiple configuration values easily.</li>
+<li>Keep configuration organized.</li>
+<li>Improve type safety.</li>
+<li>Reduce repeated use of <code>@Value</code>.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>Spring reads configuration files.</li>
+<li>It finds properties with the specified prefix.</li>
+<li>It maps those properties to fields in the Java class.</li>
+<li>The Bean can then use those values throughout the application.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>application.properties</strong></p>
+
+<pre><code>app.mail.host=smtp.gmail.com
+app.mail.port=587
+app.mail.username=admin@gmail.com
+</code></pre>
+
+<p><strong>Configuration Class</strong></p>
+
+<pre><code>@Component
+@ConfigurationProperties(prefix = "app.mail")
+public class MailProperties {
+
+    private String host;
+    private int port;
+    private String username;
+
+    // Getters and Setters
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Binds multiple properties to one class.</li>
+<li>More suitable than <code>@Value</code> for large configurations.</li>
+<li>Supports nested objects, lists, and maps.</li>
+<li>Improves readability and maintainability.</li>
+</ul>
+`
+},
+
+{
+    id: 'boot',
+    q: "How does Spring Boot's Embedded Server work?",
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Spring Boot comes with an <strong>Embedded Server</strong>, so you don't need to install or configure an external web server like Tomcat separately. The server is packaged along with your application.
+</p>
+
+<p>
+By default, Spring Boot uses <strong>Apache Tomcat</strong>, but it also supports <strong>Jetty</strong> and <strong>Undertow</strong>.
+</p>
+
+<h3>🤔 Why do we need an Embedded Server?</h3>
+
+<ul>
+<li>No need to install Tomcat manually.</li>
+<li>Applications are easier to deploy.</li>
+<li>Run the application using a single JAR file.</li>
+<li>Ideal for Docker and Microservices.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>Application starts.</li>
+<li>Spring Boot creates the ApplicationContext.</li>
+<li>The embedded server starts automatically.</li>
+<li>DispatcherServlet is registered.</li>
+<li>The server begins listening on the configured port.</li>
+<li>The application is ready to handle HTTP requests.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Main Class</strong></p>
+
+<pre><code>@SpringBootApplication
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+}
+</code></pre>
+
+<p><strong>Change Server Port</strong></p>
+
+<pre><code>server.port=9090
+</code></pre>
+
+<p><strong>Run Application</strong></p>
+
+<pre><code>mvn spring-boot:run
+
+or
+
+java -jar inventory-service.jar
+</code></pre>
+
+<h3>⭐ Supported Embedded Servers</h3>
+
+<ul>
+<li>Apache Tomcat (Default)</li>
+<li>Jetty</li>
+<li>Undertow</li>
+</ul>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>No external server installation required.</li>
+<li>Embedded Tomcat is the default server.</li>
+<li>Packaged inside the executable JAR.</li>
+<li>Perfect for cloud, Docker, and Microservices.</li>
+</ul>
+`
+},
+{
+    id: 'boot',
+    q: 'CommandLineRunner vs ApplicationRunner',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Both <code>CommandLineRunner</code> and <code>ApplicationRunner</code> are callback interfaces provided by Spring Boot. They are used to execute code <strong>after the Spring ApplicationContext has been fully initialized</strong> and before the application starts serving requests.
+</p>
+
+<p>
+They are commonly used for tasks such as loading initial data, creating default users, validating configuration, or performing startup logic.
+</p>
+
+<h3>🤔 Why do we need them?</h3>
+
+<ul>
+<li>Insert default or sample data into the database.</li>
+<li>Run initialization logic after application startup.</li>
+<li>Validate configuration or external connections.</li>
+<li>Execute startup tasks automatically.</li>
+</ul>
+
+<h3>⚙️ Difference</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>CommandLineRunner</th>
+<th>ApplicationRunner</th>
+</tr>
+
+<tr>
+<td>Receives command-line arguments as <code>String[]</code>.</td>
+<td>Receives arguments as an <code>ApplicationArguments</code> object.</td>
+</tr>
+
+<tr>
+<td>Simple to use.</td>
+<td>Provides methods to access option and non-option arguments.</td>
+</tr>
+
+<tr>
+<td>Suitable for basic startup tasks.</td>
+<td>Better when command-line arguments need to be processed.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>CommandLineRunner</strong></p>
+
+<pre><code>@Component
+public class DataLoader implements CommandLineRunner {
+
+    @Override
+    public void run(String... args) {
+
+        System.out.println("Application Started");
+
+    }
+
+}
+</code></pre>
+
+<p><strong>ApplicationRunner</strong></p>
+
+<pre><code>@Component
+public class DataLoader implements ApplicationRunner {
+
+    @Override
+    public void run(ApplicationArguments args) {
+
+        if(args.containsOption("seed")){
+            System.out.println("Load Sample Data");
+        }
+
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Both execute after the Spring Boot application starts.</li>
+<li>Both are commonly used for startup tasks.</li>
+<li><code>ApplicationRunner</code> provides better support for command-line arguments.</li>
+<li>If command-line arguments are not required, <code>CommandLineRunner</code> is usually sufficient.</li>
+</ul>
+`
+},
+
+{
+    id: 'boot',
+    q: 'What is Spring Boot DevTools?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<strong>Spring Boot DevTools</strong> is a development utility that improves developer productivity by automatically restarting the application, refreshing the browser, and disabling certain caches during development.
+</p>
+
+<p>
+It is designed only for the development environment and is automatically excluded from production builds.
+</p>
+
+<h3>🤔 Why do we need DevTools?</h3>
+
+<ul>
+<li>Automatically restart the application after code changes.</li>
+<li>Reduce development time.</li>
+<li>Improve developer productivity.</li>
+<li>Disable template caching during development.</li>
+<li>Support automatic browser refresh using LiveReload.</li>
+</ul>
+
+<h3>⚙️ Features</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td>Automatic Restart</td>
+<td>Restarts the application whenever Java classes change.</td>
+</tr>
+
+<tr>
+<td>LiveReload</td>
+<td>Automatically refreshes the browser after application restart.</td>
+</tr>
+
+<tr>
+<td>Development Properties</td>
+<td>Disables template caching for technologies like Thymeleaf.</td>
+</tr>
+
+<tr>
+<td>Fast Development</td>
+<td>Reduces the need to restart the application manually.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Add Dependency</strong></p>
+
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-devtools&lt;/artifactId&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<p>
+Now whenever you modify and save a Java class, Spring Boot automatically restarts the application.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Used only during development.</li>
+<li>Automatically restarts the application.</li>
+<li>Supports LiveReload.</li>
+<li>Improves development speed.</li>
+<li>Automatically excluded from production deployments.</li>
+</ul>
+`
+},
+{
+    id: 'mvc',
+    q: 'What is Spring MVC?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<strong>Spring MVC (Model-View-Controller)</strong> is a web framework built on top of the Java Servlet API. It helps developers build web applications and REST APIs by separating an application into three layers:
+</p>
+
+<ul>
+<li><strong>Model</strong> - Contains the business logic and data.</li>
+<li><strong>View</strong> - Displays data to the user.</li>
+<li><strong>Controller</strong> - Handles HTTP requests and coordinates between the Model and View.</li>
+</ul>
+
+<h3>🤔 Why do we need Spring MVC?</h3>
+
+<ul>
+<li>Separates business logic from presentation logic.</li>
+<li>Makes applications easier to develop and maintain.</li>
+<li>Provides annotation-based request handling.</li>
+<li>Supports REST APIs and traditional web applications.</li>
+<li>Integrates seamlessly with other Spring modules.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>User sends an HTTP request.</li>
+<li><code>DispatcherServlet</code> receives the request.</li>
+<li>It finds the appropriate Controller.</li>
+<li>The Controller calls the Service layer.</li>
+<li>The Service interacts with the Repository/Database.</li>
+<li>The Controller returns a View or JSON response.</li>
+<li>The response is sent back to the client.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@RestController
+@RequestMapping("/products")
+public class ProductController {
+
+    @GetMapping
+    public List&lt;Product&gt; getProducts() {
+
+        return List.of();
+
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Built on the Servlet API.</li>
+<li>Follows the MVC design pattern.</li>
+<li>Supports both Web Applications and REST APIs.</li>
+<li>Uses DispatcherServlet as the Front Controller.</li>
+</ul>
+`
+},
+
+{
+    id: 'mvc',
+    q: 'What is DispatcherServlet?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>DispatcherServlet</code> is the <strong>Front Controller</strong> of Spring MVC. Every incoming HTTP request first reaches the DispatcherServlet, which coordinates the complete request processing workflow.
+</p>
+
+<h3>🤔 Why do we need DispatcherServlet?</h3>
+
+<ul>
+<li>Provides a single entry point for all requests.</li>
+<li>Routes requests to the correct Controller.</li>
+<li>Reduces duplicate request handling logic.</li>
+<li>Manages the complete request-response lifecycle.</li>
+</ul>
+
+<h3>⚙️ Request Flow</h3>
+
+<pre><code>
+Browser
+   │
+   ▼
+DispatcherServlet
+   │
+   ▼
+Handler Mapping
+   │
+   ▼
+Controller
+   │
+   ▼
+Service
+   │
+   ▼
+Repository
+   │
+   ▼
+Controller
+   │
+   ▼
+DispatcherServlet
+   │
+   ▼
+JSON / View
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@RestController
+@RequestMapping("/users")
+public class UserController {
+
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable Long id){
+
+        return new User();
+
+    }
+
+}
+</code></pre>
+
+<p>
+When <code>/users/1</code> is requested, the DispatcherServlet receives the request and forwards it to the <code>getUser()</code> method.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Main controller of Spring MVC.</li>
+<li>Receives every HTTP request.</li>
+<li>Uses HandlerMapping to locate Controllers.</li>
+<li>Returns View or JSON response.</li>
+</ul>
+`
+},
+
+{
+    id: 'mvc',
+    q: '@Controller vs @RestController',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Both annotations define Spring MVC Controllers, but they serve different purposes.
+</p>
+
+<ul>
+<li><code>@Controller</code> is mainly used for traditional web applications that return HTML pages.</li>
+<li><code>@RestController</code> is used for REST APIs that return JSON or XML.</li>
+</ul>
+
+<h3>🤔 Why do we have two annotations?</h3>
+
+<ul>
+<li>Web applications return Views.</li>
+<li>REST APIs return data.</li>
+<li>Different applications require different response types.</li>
+</ul>
+
+<h3>⚙️ Comparison</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>@Controller</th>
+<th>@RestController</th>
+</tr>
+
+<tr>
+<td>Returns View Name.</td>
+<td>Returns JSON/XML.</td>
+</tr>
+
+<tr>
+<td>Used with ViewResolver.</td>
+<td>Uses HttpMessageConverter.</td>
+</tr>
+
+<tr>
+<td>Requires <code>@ResponseBody</code> to return JSON.</td>
+<td>Automatically behaves as if every method has <code>@ResponseBody</code>.</td>
+</tr>
+
+<tr>
+<td>Used in MVC applications.</td>
+<td>Used in REST APIs.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>@Controller</strong></p>
+
+<pre><code>@Controller
+public class HomeController {
+
+    @GetMapping("/")
+    public String home(){
+
+        return "home";
+
+    }
+
+}
+</code></pre>
+
+<p><strong>@RestController</strong></p>
+
+<pre><code>@RestController
+public class ProductController {
+
+    @GetMapping("/products")
+    public List&lt;Product&gt; getProducts(){
+
+        return List.of();
+
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li><code>@RestController = @Controller + @ResponseBody</code>.</li>
+<li>Use <code>@Controller</code> for HTML pages.</li>
+<li>Use <code>@RestController</code> for REST APIs.</li>
+<li>Most Spring Boot backend applications use <code>@RestController</code>.</li>
+</ul>
+`
+},
+{
+    id: 'mvc',
+    q: '@RequestMapping and HTTP Method Shortcuts',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@RequestMapping</code> is used to map an HTTP request to a Controller or Controller method. It specifies which URL should invoke a particular method.
+</p>
+
+<p>
+Since specifying the HTTP method repeatedly can be verbose, Spring MVC provides shortcut annotations like <code>@GetMapping</code>, <code>@PostMapping</code>, <code>@PutMapping</code>, <code>@DeleteMapping</code>, and <code>@PatchMapping</code>.
+</p>
+
+<h3>🤔 Why do we need Request Mapping?</h3>
+
+<ul>
+<li>Map URLs to Controller methods.</li>
+<li>Handle different HTTP methods.</li>
+<li>Organize REST APIs.</li>
+<li>Avoid writing servlet code manually.</li>
+</ul>
+
+<h3>⚙️ HTTP Method Shortcuts</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Annotation</th>
+<th>Purpose</th>
+</tr>
+
+<tr>
+<td><code>@GetMapping</code></td>
+<td>Retrieve data.</td>
+</tr>
+
+<tr>
+<td><code>@PostMapping</code></td>
+<td>Create new data.</td>
+</tr>
+
+<tr>
+<td><code>@PutMapping</code></td>
+<td>Update an existing resource completely.</td>
+</tr>
+
+<tr>
+<td><code>@PatchMapping</code></td>
+<td>Update part of a resource.</td>
+</tr>
+
+<tr>
+<td><code>@DeleteMapping</code></td>
+<td>Delete a resource.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@RestController
+@RequestMapping("/products")
+public class ProductController {
+
+    @GetMapping
+    public List&lt;Product&gt; getAllProducts() {
+
+        return List.of();
+
+    }
+
+    @GetMapping("/{id}")
+    public Product getProduct(@PathVariable Long id) {
+
+        return new Product();
+
+    }
+
+    @PostMapping
+    public Product createProduct(@RequestBody Product product) {
+
+        return product;
+
+    }
+
+    @PutMapping("/{id}")
+    public Product updateProduct(@PathVariable Long id,
+                                 @RequestBody Product product) {
+
+        return product;
+
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteProduct(@PathVariable Long id) {
+
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li><code>@RequestMapping</code> is the base mapping annotation.</li>
+<li>HTTP shortcut annotations make code cleaner.</li>
+<li>Most REST APIs mainly use GET, POST, PUT and DELETE.</li>
+<li>Can be used at both class and method level.</li>
+</ul>
+`
+},
+
+{
+    id: 'mvc',
+    q: '@PathVariable vs @RequestParam',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Both annotations are used to receive values from an HTTP request, but they get the values from different places.
+</p>
+
+<ul>
+<li><code>@PathVariable</code> reads values from the URL path.</li>
+<li><code>@RequestParam</code> reads values from the query string.</li>
+</ul>
+
+<h3>🤔 When should we use them?</h3>
+
+<ul>
+<li>Use <code>@PathVariable</code> to identify a specific resource.</li>
+<li>Use <code>@RequestParam</code> for filtering, searching, pagination, or optional values.</li>
+</ul>
+
+<h3>⚙️ Comparison</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>@PathVariable</th>
+<th>@RequestParam</th>
+</tr>
+
+<tr>
+<td>Reads value from URL.</td>
+<td>Reads value from query string.</td>
+</tr>
+
+<tr>
+<td>Usually mandatory.</td>
+<td>Can be optional.</td>
+</tr>
+
+<tr>
+<td>Used for resource identification.</td>
+<td>Used for filtering and searching.</td>
+</tr>
+
+<tr>
+<td>Example: <code>/users/10</code></td>
+<td>Example: <code>/users?page=1</code></td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>@PathVariable</strong></p>
+
+<pre><code>@GetMapping("/users/{id}")
+public User getUser(@PathVariable Long id) {
+
+    return new User();
+
+}
+</code></pre>
+
+<p>Request URL</p>
+
+<pre><code>GET /users/101
+</code></pre>
+
+<p><strong>@RequestParam</strong></p>
+
+<pre><code>@GetMapping("/users")
+public List&lt;User&gt; getUsers(
+
+    @RequestParam(defaultValue = "1") int page,
+
+    @RequestParam(defaultValue = "10") int size
+
+) {
+
+    return List.of();
+
+}
+</code></pre>
+
+<p>Request URL</p>
+
+<pre><code>GET /users?page=2&size=20
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li><code>@PathVariable</code> extracts values from the URL path.</li>
+<li><code>@RequestParam</code> extracts query parameters.</li>
+<li><code>@RequestParam</code> supports default values and optional parameters.</li>
+<li>Both can be used together in the same API.</li>
+</ul>
+`
+},
+
+{
+    id: 'mvc',
+    q: '@RequestBody and @ResponseBody',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@RequestBody</code> converts the incoming HTTP request body (usually JSON) into a Java object.
+</p>
+
+<p>
+<code>@ResponseBody</code> converts a Java object into JSON or XML and sends it back in the HTTP response.
+</p>
+
+<p>
+These conversions are performed automatically using Spring's <strong>HttpMessageConverter</strong>.
+</p>
+
+<h3>🤔 Why do we need them?</h3>
+
+<ul>
+<li>Receive JSON data from clients.</li>
+<li>Return Java objects as JSON.</li>
+<li>Avoid manual JSON parsing.</li>
+<li>Simplify REST API development.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<p><strong>Request Flow</strong></p>
+
+<pre><code>
+Client
+   │
+   ▼
+JSON Request
+   │
+   ▼
+@RequestBody
+   │
+   ▼
+Java Object
+   │
+Business Logic
+   │
+Java Object
+   │
+   ▼
+@ResponseBody
+   │
+   ▼
+JSON Response
+</code></pre>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@RestController
+@RequestMapping("/products")
+public class ProductController {
+
+    @PostMapping
+    public Product createProduct(
+            @RequestBody Product product) {
+
+        return product;
+
+    }
+
+}
+</code></pre>
+
+<p>
+The client sends JSON:</p>
+
+<pre><code>{
+    "name":"Laptop",
+    "price":65000
+}
+</code></pre>
+
+<p>
+Spring converts the JSON into a <code>Product</code> object. Since the controller is a <code>@RestController</code>, the returned object is automatically converted back into JSON.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li><code>@RequestBody</code> converts JSON to a Java object.</li>
+<li><code>@ResponseBody</code> converts a Java object to JSON.</li>
+<li><code>@RestController</code> automatically applies <code>@ResponseBody</code> to every method.</li>
+<li>Uses <code>HttpMessageConverter</code> internally.</li>
+</ul>
+`
+},
+{
+    id: 'mvc',
+    q: 'What is ResponseEntity?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>ResponseEntity&lt;T&gt;</code> is a class in Spring MVC that represents the complete HTTP response. It allows you to control the <strong>response body</strong>, <strong>HTTP status code</strong>, and <strong>response headers</strong>.
+</p>
+
+<p>
+Instead of returning only an object, you can return a <code>ResponseEntity</code> to provide additional information to the client.
+</p>
+
+<h3>🤔 Why do we need ResponseEntity?</h3>
+
+<ul>
+<li>Return custom HTTP status codes.</li>
+<li>Add response headers.</li>
+<li>Return success or error responses.</li>
+<li>Provide complete control over HTTP responses.</li>
+</ul>
+
+<h3>⚙️ ResponseEntity Components</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Component</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td>Body</td>
+<td>Actual response data.</td>
+</tr>
+
+<tr>
+<td>Status</td>
+<td>HTTP status code (200, 201, 404, etc.).</td>
+</tr>
+
+<tr>
+<td>Headers</td>
+<td>Additional HTTP response headers.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Return Success Response</strong></p>
+
+<pre><code>@GetMapping("/{id}")
+public ResponseEntity&lt;Product&gt; getProduct(
+        @PathVariable Long id) {
+
+    Product product = service.getProduct(id);
+
+    return ResponseEntity.ok(product);
+
+}
+</code></pre>
+
+<p><strong>Return Created Response</strong></p>
+
+<pre><code>@PostMapping
+public ResponseEntity&lt;Product&gt; createProduct(
+        @RequestBody Product product) {
+
+    Product saved = service.save(product);
+
+    return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(saved);
+
+}
+</code></pre>
+
+<p><strong>Return Not Found</strong></p>
+
+<pre><code>return ResponseEntity.notFound().build();
+</code></pre>
+
+<h3>⭐ Common Methods</h3>
+
+<ul>
+<li><code>ok()</code> → HTTP 200</li>
+<li><code>status()</code> → Custom status</li>
+<li><code>created()</code> → HTTP 201</li>
+<li><code>badRequest()</code> → HTTP 400</li>
+<li><code>notFound()</code> → HTTP 404</li>
+<li><code>noContent()</code> → HTTP 204</li>
+</ul>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Represents the complete HTTP response.</li>
+<li>Controls body, headers, and status code.</li>
+<li>Commonly used in REST APIs.</li>
+<li>Recommended when returning different HTTP status codes.</li>
+</ul>
+`
+},
+
+{
+    id: 'mvc',
+    q: '@ExceptionHandler and @ControllerAdvice',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+When an exception occurs in a Spring MVC application, it should be handled properly instead of exposing stack traces to the client.
+</p>
+
+<ul>
+<li><code>@ExceptionHandler</code> handles exceptions within a single Controller.</li>
+<li><code>@ControllerAdvice</code> handles exceptions globally across all Controllers.</li>
+</ul>
+
+<h3>🤔 Why do we need Global Exception Handling?</h3>
+
+<ul>
+<li>Return meaningful error messages.</li>
+<li>Avoid duplicate try-catch blocks.</li>
+<li>Centralize exception handling.</li>
+<li>Improve API consistency.</li>
+</ul>
+
+<h3>⚙️ Difference</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>@ExceptionHandler</th>
+<th>@ControllerAdvice</th>
+</tr>
+
+<tr>
+<td>Works for one Controller.</td>
+<td>Works for all Controllers.</td>
+</tr>
+
+<tr>
+<td>Local exception handling.</td>
+<td>Global exception handling.</td>
+</tr>
+
+<tr>
+<td>Used for controller-specific errors.</td>
+<td>Used for application-wide errors.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Controller Specific</strong></p>
+
+<pre><code>@ExceptionHandler(ProductNotFoundException.class)
+public ResponseEntity&lt;String&gt; handleException(
+        ProductNotFoundException ex){
+
+    return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(ex.getMessage());
+
+}
+</code></pre>
+
+<p><strong>Global Exception Handler</strong></p>
+
+<pre><code>@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity&lt;String&gt; handleException(
+            ProductNotFoundException ex){
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
+
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li><code>@ExceptionHandler</code> handles exceptions for one Controller.</li>
+<li><code>@ControllerAdvice</code> handles exceptions globally.</li>
+<li><code>@RestControllerAdvice</code> automatically returns JSON responses.</li>
+<li>Helps build consistent REST APIs.</li>
+</ul>
+`
+},
+
+{
+    id: 'mvc',
+    q: 'What is HandlerInterceptor?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+A <strong>HandlerInterceptor</strong> is a Spring MVC component that intercepts HTTP requests before and after they reach a Controller.
+</p>
+
+<p>
+It is commonly used for logging, authentication, authorization, request timing, and auditing.
+</p>
+
+<h3>🤔 Why do we need HandlerInterceptor?</h3>
+
+<ul>
+<li>Log incoming requests.</li>
+<li>Authenticate users.</li>
+<li>Measure request processing time.</li>
+<li>Execute logic before and after Controller execution.</li>
+</ul>
+
+<h3>⚙️ Lifecycle Methods</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Method</th>
+<th>When it Executes</th>
+</tr>
+
+<tr>
+<td><code>preHandle()</code></td>
+<td>Before Controller execution.</td>
+</tr>
+
+<tr>
+<td><code>postHandle()</code></td>
+<td>After Controller execution but before response is returned.</td>
+</tr>
+
+<tr>
+<td><code>afterCompletion()</code></td>
+<td>After the complete request is finished.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>public class LoggingInterceptor
+        implements HandlerInterceptor {
+
+    @Override
+    public boolean preHandle(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Object handler) {
+
+        System.out.println("Request Started");
+
+        return true;
+
+    }
+
+    @Override
+    public void afterCompletion(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Object handler,
+            Exception ex) {
+
+        System.out.println("Request Completed");
+
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Intercepts requests before and after Controller execution.</li>
+<li>Different from Servlet Filters because it works inside Spring MVC.</li>
+<li>Commonly used for logging, authentication, and auditing.</li>
+<li>Provides three lifecycle methods.</li>
+</ul>
+`
+},
+{
+    id: 'mvc',
+    q: 'What is Content Negotiation?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<strong>Content Negotiation</strong> is the process by which Spring MVC determines the format of the response that should be sent to the client. Depending on what the client requests, the same API can return data in different formats such as <strong>JSON</strong> or <strong>XML</strong>.
+</p>
+
+<p>
+Spring mainly uses the <code>Accept</code> HTTP header to determine the preferred response format.
+</p>
+
+<h3>🤔 Why do we need Content Negotiation?</h3>
+
+<ul>
+<li>Allow different clients to receive data in different formats.</li>
+<li>Support JSON, XML, and other media types.</li>
+<li>Improve API flexibility.</li>
+<li>Follow HTTP standards.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>The client sends an HTTP request.</li>
+<li>The request contains an <code>Accept</code> header.</li>
+<li>Spring checks the requested media type.</li>
+<li><code>ContentNegotiationManager</code> selects the appropriate <code>HttpMessageConverter</code>.</li>
+<li>The response is converted into the requested format.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@RestController
+@RequestMapping("/products")
+public class ProductController {
+
+    @GetMapping(
+        produces = {
+            MediaType.APPLICATION_JSON_VALUE,
+            MediaType.APPLICATION_XML_VALUE
+        }
+    )
+    public Product getProduct() {
+
+        return new Product();
+
+    }
+
+}
+</code></pre>
+
+<p><strong>Request JSON</strong></p>
+
+<pre><code>GET /products
+Accept: application/json
+</code></pre>
+
+<p><strong>Response</strong></p>
+
+<pre><code>{
+    "id":1,
+    "name":"Laptop"
+}
+</code></pre>
+
+<p><strong>Request XML</strong></p>
+
+<pre><code>GET /products
+Accept: application/xml
+</code></pre>
+
+<p><strong>Response</strong></p>
+
+<pre><code>&lt;Product&gt;
+    &lt;id&gt;1&lt;/id&gt;
+    &lt;name&gt;Laptop&lt;/name&gt;
+&lt;/Product&gt;
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Determines the response format.</li>
+<li>Mainly uses the HTTP <code>Accept</code> header.</li>
+<li>Uses <code>HttpMessageConverter</code> internally.</li>
+<li>Supports JSON, XML, and other media types.</li>
+</ul>
+`
+},
+
+{
+    id: 'mvc',
+    q: 'What is CORS and how to configure it?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<strong>CORS (Cross-Origin Resource Sharing)</strong> is a browser security mechanism that controls whether a web application can access resources from a different origin (domain, protocol, or port).
+</p>
+
+<p>
+For example, if your React application runs on <code>http://localhost:3000</code> and your Spring Boot API runs on <code>http://localhost:8080</code>, the browser blocks the request unless CORS is enabled.
+</p>
+
+<h3>🤔 Why do we need CORS?</h3>
+
+<ul>
+<li>Allow frontend and backend applications running on different origins to communicate.</li>
+<li>Protect applications from unauthorized cross-origin requests.</li>
+<li>Enable secure communication between client and server.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>A browser sends a cross-origin request.</li>
+<li>The server checks whether the origin is allowed.</li>
+<li>If allowed, the server sends CORS headers.</li>
+<li>The browser verifies those headers.</li>
+<li>If the headers are valid, the request succeeds; otherwise, it is blocked.</li>
+</ol>
+
+<h3>💻 Configure CORS for a Controller</h3>
+
+<pre><code>@RestController
+@RequestMapping("/products")
+@CrossOrigin(origins = "http://localhost:3000")
+public class ProductController {
+
+    @GetMapping
+    public List&lt;Product&gt; getProducts() {
+
+        return List.of();
+
+    }
+
+}
+</code></pre>
+
+<h3>💻 Configure CORS Globally</h3>
+
+<pre><code>@Configuration
+public class CorsConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:3000")
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedHeaders("*");
+
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>CORS allows controlled cross-origin requests.</li>
+<li>Browsers enforce CORS, not Spring Boot.</li>
+<li>Can be configured using <code>@CrossOrigin</code> or <code>WebMvcConfigurer</code>.</li>
+<li>Global configuration is recommended for large applications.</li>
+<li>Avoid using <code>allowedOrigins("*")</code> in production unless absolutely necessary.</li>
+</ul>
+`
+},
+{
+    id: 'data',
+    q: 'What is Spring Data JPA?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<strong>Spring Data JPA</strong> is a Spring module that simplifies database operations using the Java Persistence API (JPA). Instead of writing most SQL queries manually, it automatically generates implementations for repository interfaces and provides built-in CRUD operations.
+</p>
+
+<p>
+Spring Data JPA works on top of a JPA provider such as <strong>Hibernate</strong>, which performs the actual communication with the database.
+</p>
+
+<h3>🤔 Why do we need Spring Data JPA?</h3>
+
+<ul>
+<li>Reduces boilerplate database code.</li>
+<li>Automatically generates CRUD methods.</li>
+<li>Supports pagination and sorting.</li>
+<li>Allows query generation from method names.</li>
+<li>Integrates seamlessly with Spring Boot.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>Create an Entity class.</li>
+<li>Create a Repository interface.</li>
+<li>Extend <code>JpaRepository</code>.</li>
+<li>Spring automatically creates the implementation.</li>
+<li>Call repository methods without writing SQL.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Entity</strong></p>
+
+<pre><code>@Entity
+public class Product {
+
+    @Id
+    private Long id;
+
+    private String name;
+
+}
+</code></pre>
+
+<p><strong>Repository</strong></p>
+
+<pre><code>public interface ProductRepository
+        extends JpaRepository&lt;Product, Long&gt; {
+
+}
+</code></pre>
+
+<p><strong>Service</strong></p>
+
+<pre><code>@Service
+public class ProductService {
+
+    private final ProductRepository repository;
+
+    public ProductService(ProductRepository repository) {
+        this.repository = repository;
+    }
+
+    public List&lt;Product&gt; getProducts() {
+        return repository.findAll();
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Built on top of JPA.</li>
+<li>Uses Hibernate by default in Spring Boot.</li>
+<li>Automatically implements repository methods.</li>
+<li>Supports CRUD, pagination, sorting, and custom queries.</li>
+</ul>
+`
+},
+
+{
+    id: 'data',
+    q: 'What is the Repository Hierarchy?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Spring Data provides multiple repository interfaces. Each interface adds more functionality than the previous one.
+</p>
+
+<p>
+Most Spring Boot applications directly extend <code>JpaRepository</code> because it includes all commonly used features.
+</p>
+
+<h3>🤔 Why do we need Repository Interfaces?</h3>
+
+<ul>
+<li>Provide ready-made CRUD operations.</li>
+<li>Reduce database boilerplate code.</li>
+<li>Add pagination and sorting support.</li>
+<li>Simplify database access.</li>
+</ul>
+
+<h3>⚙️ Repository Hierarchy</h3>
+
+<pre><code>
+Repository
+      │
+      ▼
+CrudRepository
+      │
+      ▼
+PagingAndSortingRepository
+      │
+      ▼
+JpaRepository
+</code></pre>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Interface</th>
+<th>Features</th>
+</tr>
+
+<tr>
+<td><code>Repository</code></td>
+<td>Marker interface.</td>
+</tr>
+
+<tr>
+<td><code>CrudRepository</code></td>
+<td>Basic CRUD operations.</td>
+</tr>
+
+<tr>
+<td><code>PagingAndSortingRepository</code></td>
+<td>Pagination and Sorting.</td>
+</tr>
+
+<tr>
+<td><code>JpaRepository</code></td>
+<td>JPA-specific methods like <code>flush()</code>, <code>saveAndFlush()</code>, batch operations.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>public interface ProductRepository
+        extends JpaRepository&lt;Product, Long&gt; {
+
+}
+</code></pre>
+
+<h3>⭐ Common JpaRepository Methods</h3>
+
+<ul>
+<li><code>save()</code></li>
+<li><code>findById()</code></li>
+<li><code>findAll()</code></li>
+<li><code>deleteById()</code></li>
+<li><code>existsById()</code></li>
+<li><code>count()</code></li>
+<li><code>flush()</code></li>
+<li><code>saveAndFlush()</code></li>
+</ul>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li><code>JpaRepository</code> is the most commonly used repository interface.</li>
+<li>It inherits features from all parent interfaces.</li>
+<li>No implementation class is required.</li>
+</ul>
+`
+},
+
+{
+    id: 'data',
+    q: 'What are Derived Query Methods?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Derived Query Methods allow Spring Data JPA to generate SQL or JPQL queries automatically based on the repository method name.
+</p>
+
+<p>
+Instead of writing a query manually, Spring analyzes the method name and creates the required query at runtime.
+</p>
+
+<h3>🤔 Why do we need Derived Queries?</h3>
+
+<ul>
+<li>Avoid writing simple SQL queries.</li>
+<li>Reduce boilerplate code.</li>
+<li>Improve readability.</li>
+<li>Increase development speed.</li>
+</ul>
+
+<h3>⚙️ Common Keywords</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Keyword</th>
+<th>Example</th>
+</tr>
+
+<tr>
+<td><code>findBy</code></td>
+<td><code>findByName()</code></td>
+</tr>
+
+<tr>
+<td><code>countBy</code></td>
+<td><code>countByCategory()</code></td>
+</tr>
+
+<tr>
+<td><code>existsBy</code></td>
+<td><code>existsByEmail()</code></td>
+</tr>
+
+<tr>
+<td><code>deleteBy</code></td>
+<td><code>deleteById()</code></td>
+</tr>
+
+<tr>
+<td><code>And</code></td>
+<td><code>findByNameAndCategory()</code></td>
+</tr>
+
+<tr>
+<td><code>Or</code></td>
+<td><code>findByNameOrCode()</code></td>
+</tr>
+
+<tr>
+<td><code>Like</code></td>
+<td><code>findByNameLike()</code></td>
+</tr>
+
+<tr>
+<td><code>Between</code></td>
+<td><code>findByPriceBetween()</code></td>
+</tr>
+
+<tr>
+<td><code>OrderBy</code></td>
+<td><code>findByCategoryOrderByPriceAsc()</code></td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>public interface ProductRepository
+        extends JpaRepository&lt;Product, Long&gt; {
+
+    List&lt;Product&gt; findByCategory(String category);
+
+    List&lt;Product&gt; findByPriceBetween(
+            BigDecimal min,
+            BigDecimal max);
+
+    boolean existsByBarcode(String barcode);
+
+    List&lt;Product&gt;
+    findByNameContainingIgnoreCase(String name);
+
+}
+</code></pre>
+
+<p>
+Spring automatically generates the required query based on each method name.
+</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>No SQL is required for simple queries.</li>
+<li>Method names must follow Spring Data naming conventions.</li>
+<li>Best for simple and readable queries.</li>
+<li>Use <code>@Query</code> when queries become too complex.</li>
+</ul>
+`
+},
+{
+    id: 'data',
+    q: 'What is @Query in Spring Data JPA?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@Query</code> is an annotation used to write custom database queries when Derived Query Methods are not sufficient. It supports both <strong>JPQL (Java Persistence Query Language)</strong> and <strong>Native SQL</strong>.
+</p>
+
+<p>
+Use <code>@Query</code> when the query becomes too complex or cannot be expressed using a repository method name.
+</p>
+
+<h3>🤔 Why do we need @Query?</h3>
+
+<ul>
+<li>Write custom queries.</li>
+<li>Handle complex filtering and joins.</li>
+<li>Execute JPQL or Native SQL.</li>
+<li>Improve readability for long derived query methods.</li>
+</ul>
+
+<h3>⚙️ Types of Queries</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td>JPQL</td>
+<td>Works with Entity names and Entity fields.</td>
+</tr>
+
+<tr>
+<td>Native SQL</td>
+<td>Works directly with database tables and columns.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>JPQL Query</strong></p>
+
+<pre><code>@Query("SELECT p FROM Product p WHERE p.category = :category")
+List&lt;Product&gt; findProducts(
+        @Param("category") String category);
+</code></pre>
+
+<p><strong>Native SQL Query</strong></p>
+
+<pre><code>@Query(
+    value = "SELECT * FROM products WHERE category = :category",
+    nativeQuery = true
+)
+List&lt;Product&gt; findProductsNative(
+        @Param("category") String category);
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Supports JPQL and Native SQL.</li>
+<li>Use <code>@Param</code> for named parameters.</li>
+<li>JPQL is database independent.</li>
+<li>Use Native SQL only when database-specific features are required.</li>
+</ul>
+`
+},
+
+{
+    id: 'data',
+    q: 'save() vs saveAndFlush()',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Both <code>save()</code> and <code>saveAndFlush()</code> are methods provided by <code>JpaRepository</code> to persist entities. The main difference is when the SQL statement is sent to the database.
+</p>
+
+<h3>🤔 Why do we have two methods?</h3>
+
+<ul>
+<li>Improve database performance.</li>
+<li>Delay SQL execution when immediate synchronization isn't required.</li>
+<li>Provide control over when changes are written to the database.</li>
+</ul>
+
+<h3>⚙️ Difference</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>save()</th>
+<th>saveAndFlush()</th>
+</tr>
+
+<tr>
+<td>Saves the entity in the Persistence Context.</td>
+<td>Saves the entity and immediately flushes changes to the database.</td>
+</tr>
+
+<tr>
+<td>SQL may execute later before transaction commit.</td>
+<td>SQL executes immediately.</td>
+</tr>
+
+<tr>
+<td>Better for normal CRUD operations.</td>
+<td>Useful when later operations depend on updated database data.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Using save()</strong></p>
+
+<pre><code>Product product = repository.save(product);
+</code></pre>
+
+<p>The SQL may execute later when the transaction is committed.</p>
+
+<p><strong>Using saveAndFlush()</strong></p>
+
+<pre><code>Product product =
+        repository.saveAndFlush(product);
+</code></pre>
+
+<p>The INSERT or UPDATE SQL is executed immediately.</p>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Both methods save an entity.</li>
+<li><code>saveAndFlush()</code> immediately synchronizes with the database.</li>
+<li><code>save()</code> is sufficient for most applications.</li>
+<li>Use <code>saveAndFlush()</code> only when immediate database synchronization is required.</li>
+</ul>
+`
+},
+
+{
+    id: 'data',
+    q: 'What are Pageable and Page?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Pagination is the process of retrieving data in smaller chunks instead of loading the entire dataset at once.
+</p>
+
+<ul>
+<li><code>Pageable</code> represents the pagination request.</li>
+<li><code>Page&lt;T&gt;</code> represents the paginated result returned by Spring Data JPA.</li>
+</ul>
+
+<h3>🤔 Why do we need Pagination?</h3>
+
+<ul>
+<li>Improve application performance.</li>
+<li>Reduce memory usage.</li>
+<li>Load only required records.</li>
+<li>Support sorting and page navigation.</li>
+</ul>
+
+<h3>⚙️ Components of Pageable</h3>
+
+<ul>
+<li>Page Number</li>
+<li>Page Size</li>
+<li>Sorting</li>
+</ul>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Repository</strong></p>
+
+<pre><code>Page&lt;Product&gt; findByCategory(
+        String category,
+        Pageable pageable);
+</code></pre>
+
+<p><strong>Create Pageable</strong></p>
+
+<pre><code>Pageable pageable =
+        PageRequest.of(
+                0,
+                10,
+                Sort.by("name").ascending()
+        );
+</code></pre>
+
+<p><strong>Get Result</strong></p>
+
+<pre><code>Page&lt;Product&gt; page =
+        repository.findByCategory(
+                "Electronics",
+                pageable
+        );
+
+List&lt;Product&gt; products =
+        page.getContent();
+</code></pre>
+
+<h3>⭐ Useful Page Methods</h3>
+
+<ul>
+<li><code>getContent()</code></li>
+<li><code>getTotalElements()</code></li>
+<li><code>getTotalPages()</code></li>
+<li><code>hasNext()</code></li>
+<li><code>hasPrevious()</code></li>
+<li><code>isFirst()</code></li>
+<li><code>isLast()</code></li>
+</ul>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li><code>Pageable</code> defines page number, size, and sorting.</li>
+<li><code>Page</code> contains both data and pagination information.</li>
+<li>Recommended for large datasets.</li>
+<li>Works seamlessly with Spring Data JPA repositories.</li>
+</ul>
+`
+},
+{
+    id: 'data',
+    q: 'What is the N+1 Problem?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+The <strong>N+1 Problem</strong> is a performance issue that occurs when Hibernate executes one query to fetch the main entities and then executes an additional query for each entity to fetch its related data.
+</p>
+
+<p>
+Instead of executing a single optimized query, Hibernate executes <strong>1 + N</strong> queries, where <strong>N</strong> is the number of records retrieved.
+</p>
+
+<h3>🤔 Why is it a problem?</h3>
+
+<ul>
+<li>Increases the number of database queries.</li>
+<li>Slows down application performance.</li>
+<li>Creates unnecessary database load.</li>
+<li>Becomes a major issue when retrieving large datasets.</li>
+</ul>
+
+<h3>⚙️ How it happens</h3>
+
+<p><strong>Example</strong></p>
+
+<p>Suppose each Product belongs to a Category.</p>
+
+<pre><code>@Entity
+class Product {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Category category;
+
+}
+</code></pre>
+
+<p>When fetching all products:</p>
+
+<pre><code>List&lt;Product&gt; products =
+        repository.findAll();
+</code></pre>
+
+<p>Hibernate executes:</p>
+
+<pre><code>Query 1
+SELECT * FROM products;
+
+Query 2
+SELECT * FROM category WHERE id=1;
+
+Query 3
+SELECT * FROM category WHERE id=2;
+
+Query 4
+SELECT * FROM category WHERE id=3;
+
+...
+</code></pre>
+
+<p>
+One query loads Products, and additional queries load Categories for each Product.
+</p>
+
+<h3>💻 How to Solve It</h3>
+
+<p><strong>Using JOIN FETCH</strong></p>
+
+<pre><code>@Query("""
+SELECT p
+FROM Product p
+JOIN FETCH p.category
+""")
+List&lt;Product&gt; findAllProducts();
+</code></pre>
+
+<p><strong>Using @EntityGraph</strong></p>
+
+<pre><code>@EntityGraph(attributePaths = "category")
+List&lt;Product&gt; findAll();
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>N+1 is a Hibernate performance problem.</li>
+<li>Mostly occurs with LAZY relationships.</li>
+<li>Use <code>JOIN FETCH</code> or <code>@EntityGraph</code> to reduce queries.</li>
+<li>Always monitor generated SQL for large datasets.</li>
+</ul>
+`
+},
+
+{
+    id: 'data',
+    q: 'What is @Modifying?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+<code>@Modifying</code> is used with the <code>@Query</code> annotation when executing <strong>UPDATE</strong>, <strong>DELETE</strong>, or other data-modifying queries.
+</p>
+
+<p>
+Without <code>@Modifying</code>, Spring Data JPA assumes the query is a SELECT statement and throws an exception for update or delete operations.
+</p>
+
+<h3>🤔 Why do we need @Modifying?</h3>
+
+<ul>
+<li>Execute UPDATE queries.</li>
+<li>Execute DELETE queries.</li>
+<li>Execute bulk database operations.</li>
+<li>Improve performance by avoiding loading entities.</li>
+</ul>
+
+<h3>⚙️ How it works</h3>
+
+<ol>
+<li>Spring executes the custom query.</li>
+<li><code>@Modifying</code> tells Spring that data will be modified.</li>
+<li>The query is executed inside a transaction.</li>
+<li>The database is updated.</li>
+</ol>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Transactional
+@Modifying
+@Query("""
+UPDATE Product p
+SET p.price = :price
+WHERE p.id = :id
+""")
+int updatePrice(
+        @Param("id") Long id,
+        @Param("price") BigDecimal price);
+</code></pre>
+
+<p><strong>Delete Query</strong></p>
+
+<pre><code>@Transactional
+@Modifying
+@Query("""
+DELETE FROM Product p
+WHERE p.active = false
+""")
+void deleteInactiveProducts();
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Used only with UPDATE or DELETE queries.</li>
+<li>Must be combined with <code>@Query</code>.</li>
+<li>Usually requires <code>@Transactional</code>.</li>
+<li>Returns the number of affected rows if the method return type is <code>int</code>.</li>
+</ul>
+`
+},
+
+{
+    id: 'data',
+    q: 'What are @Entity and @Table?',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+An <code>@Entity</code> represents a Java class that is mapped to a database table. Every object of the entity represents one row in that table.
+</p>
+
+<p>
+The <code>@Table</code> annotation is optional and is used to specify the table name and additional table properties. If it is not specified, Hibernate uses the class name as the table name.
+</p>
+
+<h3>🤔 Why do we need them?</h3>
+
+<ul>
+<li>Map Java objects to database tables.</li>
+<li>Allow Hibernate to perform CRUD operations.</li>
+<li>Define table and column mappings.</li>
+</ul>
+
+<h3>⚙️ Common JPA Annotations</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Annotation</th>
+<th>Purpose</th>
+</tr>
+
+<tr>
+<td><code>@Entity</code></td>
+<td>Marks the class as a JPA Entity.</td>
+</tr>
+
+<tr>
+<td><code>@Table</code></td>
+<td>Specifies the table name.</td>
+</tr>
+
+<tr>
+<td><code>@Id</code></td>
+<td>Primary Key.</td>
+</tr>
+
+<tr>
+<td><code>@GeneratedValue</code></td>
+<td>Generates primary key values.</td>
+</tr>
+
+<tr>
+<td><code>@Column</code></td>
+<td>Customizes column mapping.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<pre><code>@Entity
+@Table(name = "products")
+public class Product {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(unique = true)
+    private String barcode;
+
+    private BigDecimal price;
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li><code>@Entity</code> maps a class to a database table.</li>
+<li>Every Entity must have a primary key.</li>
+<li><code>@Table</code> is optional.</li>
+<li><code>@Column</code> customizes column properties.</li>
+</ul>
+`
+},
+{
+    id: 'data',
+    q: "What are Spring Data's Auditing Features?",
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Spring Data JPA provides <strong>Auditing</strong> features to automatically store information about who created or modified an entity and when those changes occurred.
+</p>
+
+<p>
+Instead of manually updating these fields every time, Spring automatically fills them during database operations.
+</p>
+
+<h3>🤔 Why do we need Auditing?</h3>
+
+<ul>
+<li>Track when a record was created.</li>
+<li>Track when a record was last modified.</li>
+<li>Track who created or modified the data.</li>
+<li>Reduce repetitive code.</li>
+</ul>
+
+<h3>⚙️ Auditing Annotations</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>Annotation</th>
+<th>Purpose</th>
+</tr>
+
+<tr>
+<td><code>@CreatedDate</code></td>
+<td>Stores when the entity was created.</td>
+</tr>
+
+<tr>
+<td><code>@LastModifiedDate</code></td>
+<td>Stores when the entity was last updated.</td>
+</tr>
+
+<tr>
+<td><code>@CreatedBy</code></td>
+<td>Stores who created the entity.</td>
+</tr>
+
+<tr>
+<td><code>@LastModifiedBy</code></td>
+<td>Stores who last modified the entity.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>Enable Auditing</strong></p>
+
+<pre><code>@Configuration
+@EnableJpaAuditing
+public class JpaConfig {
+
+}
+</code></pre>
+
+<p><strong>Entity</strong></p>
+
+<pre><code>@Entity
+@EntityListeners(AuditingEntityListener.class)
+public class Product {
+
+    @Id
+    private Long id;
+
+    @CreatedDate
+    private LocalDateTime createdDate;
+
+    @LastModifiedDate
+    private LocalDateTime modifiedDate;
+
+}
+</code></pre>
+
+<p><strong>AuditorAware Implementation</strong></p>
+
+<pre><code>@Component
+public class AuditorConfig
+        implements AuditorAware&lt;String&gt; {
+
+    @Override
+    public Optional&lt;String&gt; getCurrentAuditor() {
+
+        return Optional.of("Admin");
+
+    }
+
+}
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>Automatically maintains audit fields.</li>
+<li>Requires <code>@EnableJpaAuditing</code>.</li>
+<li>Uses <code>@EntityListeners(AuditingEntityListener.class)</code>.</li>
+<li><code>AuditorAware</code> provides the current logged-in user.</li>
+</ul>
+`
+},
+
+{
+    id: 'data',
+    q: 'JPQL vs Native SQL in Spring Data JPA',
+    a: `
+<h3>📖 Definition</h3>
+
+<p>
+Spring Data JPA supports two types of custom queries:
+</p>
+
+<ul>
+<li><strong>JPQL (Java Persistence Query Language)</strong></li>
+<li><strong>Native SQL</strong></li>
+</ul>
+
+<p>
+JPQL works with <strong>Entities</strong>, while Native SQL works directly with <strong>Database Tables</strong>.
+</p>
+
+<h3>🤔 Why do we need both?</h3>
+
+<ul>
+<li>JPQL provides database independence.</li>
+<li>Native SQL allows using database-specific features.</li>
+<li>Choose the appropriate query based on the requirement.</li>
+</ul>
+
+<h3>⚙️ Comparison</h3>
+
+<table border="1" cellpadding="6">
+
+<tr>
+<th>JPQL</th>
+<th>Native SQL</th>
+</tr>
+
+<tr>
+<td>Uses Entity names.</td>
+<td>Uses table names.</td>
+</tr>
+
+<tr>
+<td>Uses Entity fields.</td>
+<td>Uses column names.</td>
+</tr>
+
+<tr>
+<td>Database independent.</td>
+<td>Database dependent.</td>
+</tr>
+
+<tr>
+<td>Portable across databases.</td>
+<td>May require changes for different databases.</td>
+</tr>
+
+<tr>
+<td>Recommended for most applications.</td>
+<td>Used for complex or database-specific queries.</td>
+</tr>
+
+</table>
+
+<h3>💻 Demo Code</h3>
+
+<p><strong>JPQL</strong></p>
+
+<pre><code>@Query("""
+SELECT p
+FROM Product p
+WHERE p.category = :category
+""")
+List&lt;Product&gt; findProducts(
+        @Param("category") String category);
+</code></pre>
+
+<p><strong>Native SQL</strong></p>
+
+<pre><code>@Query(
+value = """
+SELECT *
+FROM products
+WHERE category = :category
+""",
+nativeQuery = true
+)
+List&lt;Product&gt; findProductsNative(
+        @Param("category") String category);
+</code></pre>
+
+<h3>⭐ Key Points</h3>
+
+<ul>
+<li>JPQL works with Entities.</li>
+<li>Native SQL works with database tables.</li>
+<li>JPQL is portable across databases.</li>
+<li>Use Native SQL only when JPQL cannot satisfy the requirement.</li>
+</ul>
+`
+},
   {id:'sec',q:'What is Spring Security?',a:'A powerful authentication and access-control framework. It integrates with the Servlet filter chain to intercept requests and enforce security rules before they reach your application. Supports password auth, OAuth2/OIDC, JWT, LDAP, and more.'},
   {id:'sec',q:"How does Spring Security's filter chain work?",a:'<code>DelegatingFilterProxy</code> delegates to <code>FilterChainProxy</code>, which manages multiple <code>SecurityFilterChain</code> instances. Each chain has ordered security filters (e.g., <code>UsernamePasswordAuthenticationFilter</code>, <code>JwtFilter</code>) applied to matching requests.'},
   {id:'sec',q:'Authentication vs Authorization?',a:'Authentication verifies identity (who are you?). Authorization determines access (what can you do?). The authenticated user is stored in <code>SecurityContext</code> as an <code>Authentication</code> object containing principal, credentials, and granted authorities.'},
